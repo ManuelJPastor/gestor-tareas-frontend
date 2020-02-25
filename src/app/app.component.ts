@@ -6,5 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'gestor-tareas-frontend';
+  title = 'Bienvenido al Gestor de Tareas';
+  empresa : string = 'Ucam';
+  nombre = 'Manuel';
 }

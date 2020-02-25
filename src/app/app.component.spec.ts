@@ -19,7 +19,7 @@ describe('AppComponent', () => {
   it(`should have as title 'gestor-tareas-frontend'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('gestor-tareas-frontend');
+    expect(app.title).toEqual('Bienvenido al Gestor de Tareas');
   });
 
   it('should render title', () => {

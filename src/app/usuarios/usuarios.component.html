@@ -1,0 +1,43 @@
+<div class="card border-dark mb-3">
+  <div class="card-header">Usuarios</div>
+  <div class="card-body text-dark">
+    <h5 class="card-title">Listado de usuarios</h5>
+
+    <div class="my-2 text-left">
+      <button class="btn btn-primary btn-rounded" type="button" [routerLink] = "['/usuarios/form']">Crear Usuario</button>
+      <button class="btn btn-primary btn-rounded" type="button" (click)="ordenar()">Ordenar usuarios</button>
+    </div>
+
+    <div *ngIf="usuarios?.length == 0" class="alert alert-info">
+        No hay registros en la base de datos.
+    </div>
+
+    <table class="table table-bordered table-striped" *ngIf="usuarios?.length>0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Email</th>
+          <th>Editar</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuarios">
+          <td>{{usuario.id}}</td>
+          <td>{{usuario.nombre}}</td>
+          <td>{{usuario.apellido}}</td>
+          <td>{{usuario.email}}</td>
+          <td>
+            <button type="button" name="button" [routerLink]="['/usuarios/form', usuario.id]" class="btn btn-primary btn-sm">Editar</button>
+          </td>
+          <td>
+            <button type="button" name="button" (click)='delete(usuario)' class="btn btn-danger btn-sm">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>

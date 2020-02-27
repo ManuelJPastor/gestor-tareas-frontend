@@ -2,20 +2,20 @@
     <h1 class="text-center">Login</h1>
     <div class="card">
       <div class="card-body">
-        <form class="form-group">
+        <form class="form-group" role="form" (submit)="login()">
           <div class="alert alert-warning" *ngIf='invalidLogin'>{{errorMessage}}</div>
           <div class="alert alert-success" *ngIf='loginSuccess'>{{successMessage}}</div>
           <div class="form-group">
-            <label for="email">User Name :</label>
-            <input type="text" class="form-control" id="username" [(ngModel)]="username" placeholder="Enter User Name"
+            <label for="email">User Name:</label>
+            <input type="text" class="form-control" id="username" [(ngModel)]="credentials.username" placeholder="Enter User Name"
               name="username">
           </div>
           <div class="form-group">
             <label for="pwd">Password:</label>
-            <input type="password" class="form-control" [(ngModel)]="password" id="password" placeholder="Enter password"
+            <input type="password" class="form-control" [(ngModel)]="credentials.password" id="password" placeholder="Enter password"
               name="password">
           </div>
-          <button (click)=handleLogin() class="btn btn-success">Login</button>
+          <button type="submit" class="btn btn-success">Login</button>
         </form>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Usuario } from './usuario';
 import { UsuarioService } from './usuario.service';
 import Swal from 'sweetalert2';
+import { AuthenticationService } from '../login/auth.service';
 
 @Component({
   selector: 'app-usuarios',
@@ -12,12 +13,16 @@ export class UsuariosComponent implements OnInit {
 
   usuarios: Usuario[];
 
-  constructor(private usuarioService: UsuarioService) { }
+  constructor(private usuarioService: UsuarioService, private authService: AuthenticationService) { }
 
   ngOnInit() {
     this.usuarioService.getUsuarios().subscribe(
       usuarios => this.usuarios = usuarios
     );
+  }
+
+  authenticated() {
+    return this.authService.authenticated;
   }
 
   ordenar(): void{

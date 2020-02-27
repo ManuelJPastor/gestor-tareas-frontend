@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 
@@ -7,7 +7,30 @@ import { map } from 'rxjs/operators';
 })
 export class AuthenticationService {
 
-  // BASE_PATH: 'http://localhost:8080'
+  authenticated = false;
+  endPoint = "http://localhost:8080"
+
+  constructor(private http: HttpClient) {
+  }
+
+  authenticate(credentials, callback) {
+
+        const headers = new HttpHeaders(credentials ? {
+            Authorization : 'Basic ' + window.btoa(credentials.username + ':' + credentials.password)
+        } : {});
+
+        this.http.get(this.endPoint+'/user', {headers: headers}).subscribe(response => {
+            if (response['name']) {
+                this.authenticated = true;
+            } else {
+                this.authenticated = false;
+            }
+            return callback && callback();
+        });
+
+    }
+
+  /*// BASE_PATH: 'http://localhost:8080'
   USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser'
 
   public username: String;
@@ -53,5 +76,5 @@ export class AuthenticationService {
     let user = sessionStorage.getItem(this.USER_NAME_SESSION_ATTRIBUTE_NAME)
     if (user === null) return ''
     return user
-  }
+  }*/
 }

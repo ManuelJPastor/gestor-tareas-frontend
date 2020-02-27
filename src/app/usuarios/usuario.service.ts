@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Usuario } from './usuario';
-import { USUARIOS } from './usuario.json';
 import { Observable, of, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
@@ -13,12 +12,21 @@ import { Router } from '@angular/router';
 })
 export class UsuarioService {
 
+  private urlToken = 'http://localhost:8080/token'
+
   private urlEndPoint:string = 'http://localhost:8080/api/usuarios';
 
   private httpHeaders = new HttpHeaders({'Content-Type':'application/json'
  });
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router) {
+    http.get(this.urlToken).subscribe(data => {
+      const token = data['token'];
+      this.httpHeaders = new HttpHeaders({'Content-Type':'application/json',
+      'X-Auth-Token':token
+     });
+    }, () => {});
+  }
 
   getUsuario(id): Observable<Usuario>{
     return this.http.get<Usuario>(`${this.urlEndPoint}/${id}`).pipe(

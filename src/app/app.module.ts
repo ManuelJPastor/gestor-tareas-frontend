@@ -18,11 +18,13 @@ import { HttpInterceptorService } from './http-interceptor.service';
 
 const routes: Routes = [
   {path: '', redirectTo: '/usuarios', pathMatch: 'full'},
+  {path: 'home', redirectTo: '/usuarios', pathMatch: 'full'},
   {path: 'directivas', component: DirectivaComponent},
   {path: 'usuarios', component: UsuariosComponent},
   {path: 'usuarios/form', component: FormComponent},
   {path: 'usuarios/form/:id', component: FormComponent},
-  {path: 'login', component: LoginComponent}
+  {path: 'login', component: LoginComponent},
+  {path: 'tareas', component: TareasComponent}
 ];
 
 @NgModule({
@@ -42,11 +44,11 @@ const routes: Routes = [
     HttpClientModule,
     RouterModule.forRoot(routes)
   ],
-    providers: [UsuarioService, {
+    providers: [UsuarioService, AuthenticationService, /*{
       provide: HTTP_INTERCEPTORS,
       useClass: HttpInterceptorService,
       multi: true
-    }],
+    }*/],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

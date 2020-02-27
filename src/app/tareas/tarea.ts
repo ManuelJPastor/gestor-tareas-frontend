@@ -1,10 +1,6 @@
-import { Paso } from './paso';
-
 export class Tarea {
-  id_tarea: number;
-  nombre: string;
+  id: number;
+  titulo: string;
   descripcion: string;
   fecha_max: Date;
-  pasos: Paso[];
-
 }

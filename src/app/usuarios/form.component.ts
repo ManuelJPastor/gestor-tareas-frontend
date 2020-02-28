@@ -17,10 +17,17 @@ export class FormComponent implements OnInit {
 
   private errores: string[];
 
+  private sectores: string[];
+
   constructor(private usuarioService: UsuarioService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
     this.cargarCliente()
+
+    this.usuarioService.getSectores().subscribe(
+      sectores => this.sectores = sectores
+
+    );
   }
 
   cargarCliente(): void{

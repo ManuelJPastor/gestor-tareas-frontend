@@ -27,7 +27,7 @@
       </div>
 
       <div class="form-group row">
-        <label for="" class="col-form-label col-sm-2">Apellido</label>
+        <label for="apellido" class="col-form-label col-sm-2">Apellido</label>
         <div class="col-sm-6">
           <input type="text" class="form-control" [(ngModel)]="usuario.apellido" name="apellido" maxlength="30" #apellido="ngModel">
           <div class="alert alert-danger" *ngIf="apellido.invalid && (apellido.dirty || apellido.touched)">
@@ -39,9 +39,9 @@
       </div>
 
       <div class="form-group row">
-        <label for="" class="col-form-label col-sm-2">Email</label>
+        <label for="email" class="col-form-label col-sm-2">Email</label>
         <div class="col-sm-6">
-          <input type="text" class="form-control" [(ngModel)]="usuario.email" name="email" required email #email="ngModel">
+          <input type="email" class="form-control" [(ngModel)]="usuario.email" name="email" required email #email="ngModel">
           <div class="alert alert-danger" *ngIf="email.invalid && (email.touched)">
             <div *ngIf="email.errors.required">
               Email es requerido.
@@ -50,6 +50,27 @@
               El formato de email no es correcto.
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="password" class="col-form-label col-sm-2">Contraseña</label>
+        <div class="col-sm-6">
+          <input type="password" class="form-control" [(ngModel)]="usuario.password" name="password" required #password="ngModel">
+          <div class="alert alert-danger" *ngIf="password.invalid && (password.dirty || password.touched)">
+            <div *ngIf="password.errors.required">
+              Contraseña es requerida.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="sector" class="col-form-label col-sm-2">Sector</label>
+        <div class="col-sm-6">
+          <select class="form-control" [(ngModel)]="usuario.sector" name="sector" required #sector="ngModel">
+            <option *ngFor="let sector of sectores" [value]="sector">{{sector}}</option>
+          </select>
         </div>
       </div>
 

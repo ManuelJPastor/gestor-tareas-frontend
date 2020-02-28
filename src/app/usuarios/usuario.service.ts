@@ -79,4 +79,8 @@ export class UsuarioService {
       })
     );
   }
+
+  getSectores(): Observable<string[]>{
+    return this.http.get<String[]>(this.urlEndPoint+'/sectores', {headers: this.httpHeaders});
+  }
 }

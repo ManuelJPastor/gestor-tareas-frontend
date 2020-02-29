@@ -4,7 +4,6 @@
       <h5 class="card-title my-2">Listado de tareas</h5>
     </div>
     <div class="card-body text-dark">
-
       <div>
         <ul class="nav nav-tabs">
           <li class="nav-item">
@@ -20,8 +19,8 @@
       (page)="handlePage($event)" class="paginacion"></mat-paginator>
 
       <div class="row mb-3 ml-0">
-        <label for="estado" class="col-form-label col-sm-2">Ordenar por:</label>
-        <div class="col-sm-2">
+        <label for="estado" class="col-form-label col-sm-3 col-md-2">Ordenar por:</label>
+        <div class="col-sm-3 col-xl-2">
           <select class="form-control" name="estado">
             <option [value]="nombre">Titulo</option>
             <option [value]="fecha">Fecha</option>
@@ -48,7 +47,7 @@
             <td class="text-center">{{tarea.id}}</td>
             <td class="text-center">{{tarea.titulo}}</td>
             <td class="text-center">{{tarea.descripcion}}</td>
-            <td class="text-center">{{tarea.fechaMax}}</td>
+            <td class="text-center">{{tarea.fechaMax | date: "shortDate"}}</td>
             <td class="text-center">{{tarea.espacio}}</td>
             <td class="text-center">{{tarea.estado}}</td>
             <td class="text-center">

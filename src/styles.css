@@ -8,6 +8,13 @@ body{
   margin-bottom: 60px;
 }
 
+@media screen and (max-width: 992px) {
+     table {
+       display: block;
+       overflow-x: auto;
+     }
+}
+
 .paginacion{
   font-size: 14px;
   color: #333;

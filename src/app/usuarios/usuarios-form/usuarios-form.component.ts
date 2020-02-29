@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { Usuario } from './usuario';
-import { UsuarioService } from './usuario.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import swal from 'sweetalert2'
+import { Usuario } from '../usuario';
+import { UsuarioService } from '../usuario.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-form',
-  templateUrl: './form.component.html',
-  styleUrls: ['./form.component.css']
+  selector: 'app-usuarios-form',
+  templateUrl: './usuarios-form.component.html',
+  styleUrls: ['./usuarios-form.component.css']
 })
-export class FormComponent implements OnInit {
+export class UsuariosFormComponent implements OnInit {
 
   private usuario: Usuario = new Usuario();
   private tituloCrear:string = "Crear Usuario";
@@ -42,7 +42,7 @@ export class FormComponent implements OnInit {
   create(): void{
     this.usuarioService.create(this.usuario).subscribe(response => {
       this.router.navigate(['/usuarios'])
-      swal.fire('Nuevo Usuario',`${response.mensaje}: ${response.usuario.nombre}`, 'success')
+      Swal.fire('Nuevo Usuario',`${response.mensaje}: ${response.usuario.nombre}`, 'success')
     }, err => {
       this.errores = err.error.errores as string[];
 
@@ -53,7 +53,7 @@ export class FormComponent implements OnInit {
   update(): void{
     this.usuarioService.update(this.usuario).subscribe(response => {
       this.router.navigate(['usuarios'])
-      swal.fire('Usuario Actualizado',`${response.mensaje}: ${response.usuario.nombre}`, 'success')
+      Swal.fire('Usuario Actualizado',`${response.mensaje}: ${response.usuario.nombre}`, 'success')
     }, err => {
       this.errores = err.error.errores as string[];
 

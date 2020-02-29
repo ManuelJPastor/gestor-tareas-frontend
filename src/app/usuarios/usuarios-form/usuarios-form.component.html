@@ -32,7 +32,7 @@
           <input type="text" class="form-control" [(ngModel)]="usuario.apellido" name="apellido" maxlength="30" #apellido="ngModel">
           <div class="alert alert-danger" *ngIf="apellido.invalid && (apellido.dirty || apellido.touched)">
             <div *ngIf="apellido.errors.maxlength">
-              Nombre debe tener como máximo 30 caracteres.
+              Apellido debe tener como máximo 30 caracteres.
             </div>
           </div>
         </div>
@@ -84,7 +84,6 @@
         </div>
       </div>
     </form>
-
 
   </div>
 </div>

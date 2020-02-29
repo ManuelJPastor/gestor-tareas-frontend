@@ -74,7 +74,7 @@ export class TareaService {
     );
   }
 
-  getSectores(): Observable<string[]>{
-    return this.http.get<string[]>(this.urlEndPoint+'/sectores', {headers: this.httpHeaders});
+  getEstados(): Observable<string[]>{
+    return this.http.get<string[]>(this.urlEndPoint+'/estados', {headers: this.httpHeaders});
   }
 }

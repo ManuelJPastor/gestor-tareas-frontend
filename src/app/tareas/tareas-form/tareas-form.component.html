@@ -1,0 +1,76 @@
+<ul class="alert alert-danger" *ngIf="errores?.length > 0">
+  <li *ngFor="let err of errores">
+    {{err}}
+  </li>
+</ul>
+<div class="card bg-dark text-white">
+  <div class="card-header" *ngIf="!tarea.id else tituloBlock">{{tituloCrear}}</div>
+  <ng-template #tituloBlock>
+    <div class="card-header">{{tituloEditar}}</div>
+  </ng-template>
+  <div class="card-body">
+
+    <form #tareaForm="ngForm">
+      <div class="form-group row">
+        <label for="titulo" class="col-form-label col-sm-2">Título</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control" [(ngModel)]="tarea.titulo" name="titulo" required maxlength="50" #titulo="ngModel">
+          <div class="alert alert-danger" *ngIf="titulo.invalid && (titulo.dirty || titulo.touched)">
+            <div *ngIf="titulo.errors.required">
+              Titulo es requerido.
+            </div>
+            <div *ngIf="titulo.errors.maxlength">
+              Titulo debe tener como máximo 50 caracteres.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="descripcion" class="col-form-label col-sm-2">Descripción</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control" [(ngModel)]="tarea.descripcion" name="descripcion">
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="fechaMax" class="col-form-label col-sm-2">Fecha Máxima</label>
+        <div class="col-sm-6">
+          <input type="date" class="form-control" [(ngModel)]="tarea.fechaMax" name="fechaMax" required #fechaMax="ngModel">
+          <div class="alert alert-danger" *ngIf="fechaMax.invalid && (fechaMax.dirty || fechaMax.touched)">
+            <div *ngIf="titulo.errors.required">
+              Fecha Máxima es requerida.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="espacio" class="col-form-label col-sm-2">Espacio</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control" [(ngModel)]="tarea.espacio" name="espacio">
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="estado" class="col-form-label col-sm-2">Estado</label>
+        <div class="col-sm-6">
+          <select class="form-control" [(ngModel)]="tarea.estado" name="estado" required #estado="ngModel">
+            <option *ngFor="let estado of estados" [value]="estado">{{estado}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="col-sm-6">
+          <button class="btn btn-primary" role="button" (click)='create()' *ngIf="!tarea.id else elseBlock" [disabled]="!tareaForm.form.valid">Crear</button>
+
+          <ng-template #elseBlock>
+            <button class="btn btn-primary" role="button" (click)='update()' [disabled]="!tareaForm.form.valid">Editar</button>
+          </ng-template>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</div>

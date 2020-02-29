@@ -8,6 +8,7 @@ body{
   margin-bottom: 60px;
 }
 
-.wrap{
-  padding-bottom: 60px;
+.paginacion{
+  font-size: 14px;
+  color: #333;
 }

@@ -15,6 +15,10 @@ import { TareasComponent } from './tareas/tareas.component';
 import { LoginComponent } from './login/login.component';
 import { AuthenticationService } from './login/auth.service';
 import { HttpInterceptorService } from './http-interceptor.service';
+import { PaginacionPipe } from './pipes/paginacion.pipe';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator'
+import { CustomMatPaginatorIntl } from './paginator-es';
 
 const routes: Routes = [
   {path: '', redirectTo: '/usuarios', pathMatch: 'full'},
@@ -36,15 +40,18 @@ const routes: Routes = [
     UsuariosComponent,
     FormComponent,
     TareasComponent,
-    LoginComponent
+    LoginComponent,
+    PaginacionPipe
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes),
+    BrowserAnimationsModule,
+    MatPaginatorModule
   ],
-    providers: [UsuarioService, AuthenticationService, /*{
+    providers: [UsuarioService, AuthenticationService, {provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl} /*{
       provide: HTTP_INTERCEPTORS,
       useClass: HttpInterceptorService,
       multi: true

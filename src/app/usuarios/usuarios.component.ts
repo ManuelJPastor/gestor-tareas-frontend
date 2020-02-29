@@ -3,6 +3,7 @@ import { Usuario } from './usuario';
 import { UsuarioService } from './usuario.service';
 import Swal from 'sweetalert2';
 import { AuthenticationService } from '../login/auth.service';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-usuarios',
@@ -12,6 +13,15 @@ import { AuthenticationService } from '../login/auth.service';
 export class UsuariosComponent implements OnInit {
 
   usuarios: Usuario[];
+
+  page_number: number = 1;
+  page_size: number = 10;
+  pageSizeOptions = [5, 10, 20, 50, 100];
+
+  handlePage(e: PageEvent){
+    this.page_size = e.pageSize
+    this.page_number=e.pageIndex + 1
+  }
 
   constructor(private usuarioService: UsuarioService, private authService: AuthenticationService) { }
 
@@ -27,7 +37,6 @@ export class UsuariosComponent implements OnInit {
 
   ordenar(): void{
     this.usuarios.sort((a,b) => b.nombre.localeCompare(a.nombre));
-    console.log(this.usuarios);
   }
 
   delete(usuario: Usuario): void {

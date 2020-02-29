@@ -5,6 +5,8 @@
     </div>
     <div class="card-body text-dark">
 
+      <mat-paginator [length]="usuarios.length" [pageSize]="page_size" [pageSizeOptions]="pageSizeOptions"
+      (page)="handlePage($event)" class="paginacion"></mat-paginator>
 
       <div class="mb-3 text-left">
         <button class="btn btn-primary btn-rounded" type="button" [routerLink] = "['/usuarios/form']">Crear Usuario</button>
@@ -29,7 +31,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let usuario of usuarios">
+          <tr *ngFor="let usuario of usuarios | paginacion:page_size:page_number">
             <td class="text-center">{{usuario.id}}</td>
             <td class="text-center">{{usuario.nombre}}</td>
             <td class="text-center">{{usuario.apellido}}</td>

@@ -1,50 +1,44 @@
 import { Injectable } from '@angular/core';
-import { Usuario } from './usuario';
-import { Observable, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
-import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
-
+import { Observable, throwError } from 'rxjs';
+import { Tarea } from './tarea';
+import Swal from 'sweetalert2';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UsuarioService {
+export class TareaService {
 
-  private urlToken = 'http://localhost:8080/token'
-
-  private urlEndPoint:string = 'http://localhost:8080/api/usuarios';
+  private urlEndPoint:string = 'http://localhost:8080/api/tareas';
 
   private httpHeaders = new HttpHeaders({'Content-Type':'application/json'
  });
 
   constructor(private http: HttpClient, private router: Router) {
-    http.get(this.urlToken).subscribe(data => {
-      const token = data['token'];
-      this.httpHeaders = new HttpHeaders({'Content-Type':'application/json',
-      'X-Auth-Token':token
-     });
-    }, () => {});
   }
 
-  getUsuario(id): Observable<Usuario>{
-    return this.http.get<Usuario>(`${this.urlEndPoint}/${id}`).pipe(
+  getTarea(id): Observable<Tarea>{
+    return this.http.get<Tarea>(`${this.urlEndPoint}/${id}`).pipe(
       catchError(e => {
-        this.router.navigate(['/usuarios']);
+        this.router.navigate(['/tareas']);
         Swal.fire('Error al editar', e.error.mensaje, 'error');
         return throwError(e);
       })
     );
   }
 
-  getUsuarios(): Observable<Usuario[]> {
-    //return of(USUARIOS);
-    return this.http.get<Usuario[]>(this.urlEndPoint, {headers: this.httpHeaders});
+  getTareas(): Observable<Tarea[]> {
+    return this.http.get<Tarea[]>(this.urlEndPoint, {headers: this.httpHeaders});
   }
 
-  create(usuario: Usuario) : Observable<any> {
-    return this.http.post<any>(this.urlEndPoint, usuario, {headers: this.httpHeaders}).pipe(
+  getMisTareas(id): Observable<Tarea[]> {
+    return this.http.get<Tarea[]>(`${this.urlEndPoint}/mistareas/${id}`, {headers: this.httpHeaders});
+  }
+
+  create(tarea: Tarea) : Observable<any> {
+    return this.http.post<any>(this.urlEndPoint, tarea, {headers: this.httpHeaders}).pipe(
       catchError(e => {
 
         if(e.status==400){
@@ -57,8 +51,8 @@ export class UsuarioService {
     );
   }
 
-  update(usuario: Usuario) : Observable<any> {
-    return this.http.put<any>(`${this.urlEndPoint}/${usuario.id}`, usuario, {headers: this.httpHeaders}).pipe(
+  update(tarea: Tarea) : Observable<any> {
+    return this.http.put<any>(`${this.urlEndPoint}/${tarea.id}`, tarea, {headers: this.httpHeaders}).pipe(
       catchError(e => {
 
         if(e.status==400){

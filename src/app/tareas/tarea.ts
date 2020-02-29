@@ -4,7 +4,7 @@ export class Tarea {
   id: number;
   titulo: string;
   descripcion: string;
-  fecha_max: Date;
+  fechaMax: Date;
   espacio: String;
   estado: String;
   usuarios: Usuario[];

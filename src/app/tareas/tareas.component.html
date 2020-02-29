@@ -5,30 +5,59 @@
     </div>
     <div class="card-body text-dark">
 
+      <div>
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <button class="nav-link" style="outline: none" (click)="mostrarTodas=false" [ngClass]="{active: !mostrarTodas}">Mis Tareas</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" style="outline: none" (click)="mostrarTodas=true" [ngClass]="{active: mostrarTodas}" >Todas</button>
+          </li>
+        </ul>
+      </div>
 
-      <ul class="nav nav-tabs">
-        <li class="nav-item">
-          <button class="nav-link active" href="/tareas/mistareas">Mis Tareas</button>
-        </li>
-        <li class="nav-item">
-          <button class="nav-link" href="/tareas/todas">Todas</button>
-        </li>
-      </ul>
+      <mat-paginator [length]="tareas.length" [pageSize]="page_size" [pageSizeOptions]="pageSizeOptions"
+      (page)="handlePage($event)" class="paginacion"></mat-paginator>
+
+      <div class="row mb-3 ml-0">
+        <label for="estado" class="col-form-label col-sm-2">Ordenar por:</label>
+        <div class="col-sm-2">
+          <select class="form-control" name="estado">
+            <option [value]="nombre">Titulo</option>
+            <option [value]="fecha">Fecha</option>
+            <option [value]="estado">Estado</option>
+          </select>
+        </div>
+      </div>
 
       <table class="table card-table table-bordered table-striped">
         <thead>
           <tr>
             <th class="text-center">Id</th>
-            <th class="text-center">Nombre</th>
-            <th class="text-center">Apellido</th>
-            <th class="text-center">Email</th>
-            <th class="text-center">Sector</th>
-            <th class="text-center">Roles</th>
+            <th class="text-center">Titulo</th>
+            <th class="text-center">Descripción</th>
+            <th class="text-center">Fecha Máxima</th>
+            <th class="text-center">Espacio</th>
+            <th class="text-center">Estado</th>
             <th class="text-center">Editar</th>
             <th class="text-center">Eliminar</th>
           </tr>
         </thead>
         <tbody>
+          <tr *ngFor="let tarea of tareas | paginacion:page_size:page_number">
+            <td class="text-center">{{tarea.id}}</td>
+            <td class="text-center">{{tarea.titulo}}</td>
+            <td class="text-center">{{tarea.descripcion}}</td>
+            <td class="text-center">{{tarea.fechaMax}}</td>
+            <td class="text-center">{{tarea.espacio}}</td>
+            <td class="text-center">{{tarea.estado}}</td>
+            <td class="text-center">
+              <button type="button" name="button" [routerLink]="['/tareas/form', tarea.id]" class="btn btn-primary btn-sm">Editar</button>
+            </td>
+            <td class="text-center">
+              <button type="button" name="button" (click)='delete(tarea)' class="btn btn-danger btn-sm">Eliminar</button>
+            </td>
+          </tr>
         </tbody>
       </table>
 

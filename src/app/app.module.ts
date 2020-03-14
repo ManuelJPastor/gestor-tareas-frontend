@@ -9,7 +9,6 @@ import { UsuariosComponent } from './usuarios/usuarios.component';
 import { UsuarioService } from './usuarios/usuario.service';
 import { RouterModule, Routes } from '@angular/router';
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
-import { FormsModule } from '@angular/forms';
 import { TareasComponent } from './tareas/tareas.component';
 import { LoginComponent } from './login/login.component';
 import { AuthenticationService } from './login/auth.service';
@@ -20,6 +19,8 @@ import { MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginato
 import { CustomMatPaginatorIntl } from './paginator-es';
 import { UsuariosFormComponent } from './usuarios/usuarios-form/usuarios-form.component';
 import { TareasFormComponent } from './tareas/tareas-form/tareas-form.component';
+import { FormsModule } from '@angular/forms';
+
 
 const routes: Routes = [
   {path: '', redirectTo: '/usuarios', pathMatch: 'full'},
@@ -45,7 +46,6 @@ const routes: Routes = [
     TareasComponent,
     LoginComponent,
     PaginacionPipe,
-    UsuariosFormComponent,
     TareasFormComponent
   ],
   imports: [

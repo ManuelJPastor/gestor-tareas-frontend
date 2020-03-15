@@ -20,6 +20,9 @@ import { CustomMatPaginatorIntl } from './paginator-es';
 import { UsuariosFormComponent } from './usuarios/usuarios-form/usuarios-form.component';
 import { TareasFormComponent } from './tareas/tareas-form/tareas-form.component';
 import { FormsModule } from '@angular/forms';
+import { SettingsComponent } from './settings/settings.component';
+import { SectoresComponent } from './settings/sectores/sectores.component';
+import { SectoresFormComponent } from './settings/sectores/sectores-form/sectores-form.component';
 
 
 const routes: Routes = [
@@ -33,6 +36,10 @@ const routes: Routes = [
   {path: 'tareas', component: TareasComponent},
   {path: 'tareas/form', component: TareasFormComponent},
   {path: 'tareas/form/:id', component: TareasFormComponent},
+  {path: 'settings', component: SettingsComponent},
+  {path: 'settings/sectores', component: SectoresComponent},
+  {path: 'settings/sectores/form', component: SectoresFormComponent},
+  {path: 'settings/sectores/form/:id', component: SectoresFormComponent},
 ];
 
 @NgModule({
@@ -46,7 +53,10 @@ const routes: Routes = [
     TareasComponent,
     LoginComponent,
     PaginacionPipe,
-    TareasFormComponent
+    TareasFormComponent,
+    SettingsComponent,
+    SectoresComponent,
+    SectoresFormComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,43 @@
+
+  <div class="card border-dark">
+    <div class="card-header">
+      <h5 class="card-title my-2">Sectores</h5>
+    </div>
+    <div class="card-body text-dark">
+
+      <mat-paginator [length]="sectores.length" [pageSize]="page_size" [pageSizeOptions]="pageSizeOptions"
+      (page)="handlePage($event)" class="paginacion"></mat-paginator>
+
+      <div class="mb-3 text-left">
+        <button class="btn btn-primary btn-rounded" type="button" [routerLink] = "['/settings/sectores/form']">Crear Sector</button>
+      </div>
+
+      <div *ngIf="sectores?.length == 0" class="alert alert-info">
+          No hay registros en la base de datos.
+      </div>
+
+      <table class="table card-table table-bordered table-striped" *ngIf="sectores?.length>0">
+        <thead>
+          <tr>
+            <th class="text-center">Id</th>
+            <th class="text-center col-sm-4">Sector</th>
+            <th class="text-center">Editar</th>
+            <th class="text-center">Eliminar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let sector of sectores | paginacion:page_size:page_number">
+            <td class="text-center">{{sector.id}}</td>
+            <td class="text-center">{{sector.sector}}</td>
+            <td class="text-center">
+              <button type="button" name="button" [routerLink]="['/settings/sectores/form', sector.id]" class="btn btn-primary btn-sm">Editar</button>
+            </td>
+            <td class="text-center">
+              <button type="button" name="button" (click)='delete(sector)' class="btn btn-danger btn-sm">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>

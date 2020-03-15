@@ -75,49 +75,6 @@
       </div>
 
       <div class="form-group row">
-        <label for="prueba" class="col-form-label col-sm-2">Prueba</label>
-        <div class="col-sm-8">
-          <div class="btn-group">
-            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Action
-            </button>
-            <div class="dropdown-menu">
-              <table class="table card-table table-bordered table-striped dropdown-item" *ngIf="usuarios?.length>0">
-                <thead>
-                  <tr>
-                    <th class="text-center">Id</th>
-                    <th class="text-center">Nombre</th>
-                    <th class="text-center">Apellido</th>
-                    <th class="text-center">Email</th>
-                    <th class="text-center">Sector</th>
-                    <th class="text-center">Roles</th>
-                    <th class="text-center">Editar</th>
-                    <th class="text-center">Eliminar</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let usuario of usuarios | paginacion:page_size:page_number">
-                    <td class="text-center">{{usuario.id}}</td>
-                    <td class="text-center">{{usuario.nombre}}</td>
-                    <td class="text-center">{{usuario.apellido}}</td>
-                    <td class="text-center">{{usuario.email}}</td>
-                    <td class="text-center">{{usuario.sector}}</td>
-                    <td class="text-center"><ng-container *ngFor="let role of usuario.roles; let lastcall=last">{{role.role}}<ng-container *ngIf="!lastcall">, </ng-container></ng-container></td>
-                    <td class="text-center">
-                      <button type="button" name="button" [routerLink]="['/usuarios/form', usuario.id]" class="btn btn-primary btn-sm">Editar</button>
-                    </td>
-                    <td class="text-center">
-                      <button type="button" name="button" (click)='delete(usuario)' class="btn btn-danger btn-sm">Eliminar</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group row">
         <div class="col-sm-8">
           <button class="btn btn-primary" role="button" (click)='create()' *ngIf="!usuario.id else elseBlock" [disabled]="!usuarioForm.form.valid">Crear</button>
 

@@ -1,0 +1,41 @@
+<ul class="alert alert-danger" *ngIf="errores?.length > 0">
+  <li *ngFor="let err of errores">
+    {{err}}
+  </li>
+</ul>
+<div class="card bg-dark text-white">
+  <div class="card-header" *ngIf="!sector.id else tituloBlock">{{tituloCrear}}</div>
+  <ng-template #tituloBlock>
+    <div class="card-header">{{tituloEditar}}</div>
+  </ng-template>
+  <div class="card-body">
+
+    <form #sectorForm="ngForm">
+      <div class="form-group row">
+        <label for="sector" class="col-form-label col-sm-2">Sector</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" [(ngModel)]="sector.sector" name="sector" required maxlength="30" #Sector="ngModel">
+          <div class="alert alert-danger" *ngIf="Sector.invalid && (Sector.dirty || Sector.touched)">
+            <div *ngIf="Sector.errors.required">
+              Sector es requerido.
+            </div>
+            <div *ngIf="Sector.errors.maxlength">
+              Sector debe tener como máximo 30 caracteres.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="col-sm-8">
+          <button class="btn btn-primary" role="button" (click)='create()' *ngIf="!sector.id else elseBlock" [disabled]="!sectorForm.form.valid">Crear</button>
+
+          <ng-template #elseBlock>
+            <button class="btn btn-primary" role="button" (click)='update()' [disabled]="!sectorForm.form.valid">Editar</button>
+          </ng-template>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</div>

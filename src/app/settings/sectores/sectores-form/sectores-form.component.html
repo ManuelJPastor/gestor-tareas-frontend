@@ -1,3 +1,5 @@
+<a class="nav-link" routerLink="/settings/sectores"><i class="fa fa-chevron-left fa-2x"></i></a>
+
 <ul class="alert alert-danger" *ngIf="errores?.length > 0">
   <li *ngFor="let err of errores">
     {{err}}
@@ -13,7 +15,7 @@
     <form #sectorForm="ngForm">
       <div class="form-group row">
         <label for="sector" class="col-form-label col-sm-2">Sector</label>
-        <div class="col-sm-8">
+        <div class="col-sm-4">
           <input type="text" class="form-control" [(ngModel)]="sector.sector" name="sector" required maxlength="30" #Sector="ngModel">
           <div class="alert alert-danger" *ngIf="Sector.invalid && (Sector.dirty || Sector.touched)">
             <div *ngIf="Sector.errors.required">
@@ -27,11 +29,115 @@
       </div>
 
       <div class="form-group row">
+        <label for="actores" class="col-form-label col-sm-2">Actores</label>
+        <div class="col-sm-9">
+          <table class="table card-table table-bordered table-striped text-white">
+            <thead>
+              <tr>
+                <th class="text-center">Nombre</th>
+                <th class="text-center">Email</th>
+                <th class="text-center">Teléfono</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr>
+                <td colspan="4" class="text-center h5 text-success">Añadir Actor</td>
+              </tr>
+
+              <tr>
+                <td class="text-center">
+                  <input type="text" class="form-control" [(ngModel)]="actorNuevo.nombre" placeholder="Nombre" name="nombreNuevo" maxlength="30" #nombre="ngModel">
+                  <div class="alert alert-danger" *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)">
+                    <div *ngIf="nombre.errors.required">
+                      Nombre es requerido.
+                    </div>
+                    <div *ngIf="nombre.errors.maxlength">
+                      Nombre debe tener como máximo 30 caracteres.
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <input type="email" class="form-control" [(ngModel)]="actorNuevo.email" placeholder="Email" name="emailNuevo" email #email="ngModel">
+                  <div class="alert alert-danger" *ngIf="email.invalid && (email.touched)">
+                    <div *ngIf="email.errors.required">
+                      Email es requerido.
+                    </div>
+                    <div *ngIf="email.errors.email">
+                      El formato de email no es correcto.
+                    </div>
+                    <div *ngIf="emailRepetido">
+                      Ya existe un actor con ese email.
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <input type="tel" class="form-control" [(ngModel)]="actorNuevo.telefono" placeholder="Teléfono" name="telefonoNuevo" pattern="[0-9]{9}"  #telefono="ngModel">
+                  <div class="alert alert-danger" *ngIf="telefono.invalid && (email.touched)">
+                    <div *ngIf="telefono.errors.pattern">
+                      El formato de teléfono no es correcto.
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <button type="button" name="button" (click)='createActor()' class="btn btn-success btn-sm">Añadir</button>
+                </td>
+              </tr>
+
+              <tr>
+                <td colspan="4" class="text-center h5 text-primary">Lista de Actores</td>
+              </tr>
+
+              <tr>
+                <td colspan="4" class="text-center h6 text-secondary" *ngIf="sector.actores?.length == 0">No hay registros de actores</td>
+              </tr>
+
+              <tr *ngFor="let actor of sector.actores">
+                <td class="text-center">
+                  <input type="text" class="form-control" [(ngModel)]="actor.nombre" name="nombre-{{actor.email}}" required maxlength="30" #nombre="ngModel">
+                  <div class="alert alert-danger" *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)">
+                    <div *ngIf="nombre.errors.required">
+                      Nombre es requerido.
+                    </div>
+                    <div *ngIf="nombre.errors.maxlength">
+                      Nombre debe tener como máximo 30 caracteres.
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <input type="email" class="form-control" [(ngModel)]="actor.email" name="email-{{actor.email}}" required email #email="ngModel">
+                  <div class="alert alert-danger" *ngIf="email.invalid && (email.touched)">
+                    <div *ngIf="email.errors.required">
+                      Email es requerido.
+                    </div>
+                    <div *ngIf="email.errors.email">
+                      El formato de email no es correcto.
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <input type="tel" class="form-control" [(ngModel)]="actor.telefono" name="telefono-{{actor.email}}" pattern="[0-9]{9}"  #telefono="ngModel">
+                  <div class="alert alert-danger" *ngIf="telefono.invalid && (email.touched)">
+                    <div *ngIf="telefono.errors.pattern">
+                      El formato de teléfono no es correcto.
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <button type="button" name="button" (click)='deleteActor(actor)' class="btn btn-danger btn-sm">Eliminar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="form-group row">
         <div class="col-sm-8">
           <button class="btn btn-primary" role="button" (click)='create()' *ngIf="!sector.id else elseBlock" [disabled]="!sectorForm.form.valid">Crear</button>
-
           <ng-template #elseBlock>
-            <button class="btn btn-primary" role="button" (click)='update()' [disabled]="!sectorForm.form.valid">Editar</button>
+            <button class="btn btn-primary" role="button" (click)='update()' [disabled]="!sectorForm.form.valid">Guardar</button>
           </ng-template>
         </div>
       </div>

@@ -23,10 +23,12 @@ export class SectoresFormComponent implements OnInit {
   constructor(private sectorService: SectorService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
-    this.cargarCliente()
+
+    this.cargarSector()
+
   }
 
-  cargarCliente(): void{
+  cargarSector(): void{
     this.activatedRoute.params.subscribe(params => {
       let id = params['id']
       if(id){

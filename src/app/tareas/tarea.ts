@@ -1,4 +1,5 @@
 import { Usuario } from '../usuarios/usuario';
+import { Sector } from '../settings/sectores/sector';
 
 export class Tarea {
   id: number;
@@ -7,5 +8,6 @@ export class Tarea {
   fechaMax: Date;
   espacio: String;
   estado: String;
-  usuarios: Usuario[];
+  sector: Sector = new Sector();
+  usuarios: Usuario[] = new Array<Usuario>();
 }

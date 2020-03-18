@@ -3,6 +3,8 @@ import { Tarea } from '../tarea';
 import { TareaService } from '../tarea.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { SectorService } from 'src/app/settings/sectores/sector.service';
+import { Sector } from 'src/app/settings/sectores/sector';
 
 @Component({
   selector: 'app-tareas-form',
@@ -17,20 +19,16 @@ export class TareasFormComponent implements OnInit {
 
   private errores: string[];
 
-  private estados: string[];
+  private sectores: Sector[];
 
-  constructor(private tareaService: TareaService, private router: Router, private activatedRoute: ActivatedRoute) { }
+  constructor(private tareaService: TareaService, private sectorService: SectorService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
-    this.cargarCliente()
-
-    this.tareaService.getEstados().subscribe(
-      estados => this.estados = estados
-
-    );
+    this.cargarTarea();
+    this.sectorService.getSectores().subscribe(sectores => this.sectores = sectores);
   }
 
-  cargarCliente(): void{
+  cargarTarea(): void{
     this.activatedRoute.params.subscribe(params => {
       let id = params['id']
       if(id){
@@ -39,7 +37,12 @@ export class TareasFormComponent implements OnInit {
     })
   }
 
+  editarSector(): void{
+    this.tarea.sector = this.sectores.find(sector => sector.sector == this.tarea.sector.sector)
+  }
+
   create(): void{
+    this.editarSector()
     this.tareaService.create(this.tarea).subscribe(response => {
       this.router.navigate(['/tareas'])
       Swal.fire('Nueva Tarea',`${response.mensaje}: ${response.tarea.titulo}`, 'success')
@@ -51,6 +54,7 @@ export class TareasFormComponent implements OnInit {
   }
 
   update(): void{
+    this.editarSector()
     this.tareaService.update(this.tarea).subscribe(response => {
       this.router.navigate(['tareas'])
       Swal.fire('Tarea Actualizada',`${response.mensaje}: ${response.tarea.titulo}`, 'success')

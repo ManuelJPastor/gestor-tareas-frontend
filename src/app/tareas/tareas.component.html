@@ -4,7 +4,7 @@
       <h5 class="card-title my-2">Listado de tareas</h5>
     </div>
     <div class="card-body text-dark">
-      <div>
+    <!--<div>
         <ul class="nav nav-tabs">
           <li class="nav-item">
             <button class="nav-link" style="outline: none" (click)="mostrarTodas=false" [ngClass]="{active: !mostrarTodas}">Mis Tareas</button>
@@ -13,12 +13,12 @@
             <button class="nav-link" style="outline: none" (click)="mostrarTodas=true" [ngClass]="{active: mostrarTodas}" >Todas</button>
           </li>
         </ul>
-      </div>
+      </div>-->
 
       <mat-paginator [length]="tareas.length" [pageSize]="page_size" [pageSizeOptions]="pageSizeOptions"
       (page)="handlePage($event)" class="paginacion"></mat-paginator>
 
-      <div class="row mb-3 ml-0">
+      <!--<div class="row mb-3 ml-0">
         <label for="estado" class="col-form-label col-sm-3 col-md-2">Ordenar por:</label>
         <div class="col-sm-3 col-xl-2">
           <select class="form-control" name="estado">
@@ -27,12 +27,11 @@
             <option [value]="estado">Estado</option>
           </select>
         </div>
-      </div>
+      </div>-->
 
       <table class="table card-table table-bordered table-striped">
         <thead>
           <tr>
-            <th class="text-center">Id</th>
             <th class="text-center">Titulo</th>
             <th class="text-center">Descripción</th>
             <th class="text-center">Fecha Máxima</th>
@@ -44,7 +43,6 @@
         </thead>
         <tbody>
           <tr *ngFor="let tarea of tareas | paginacion:page_size:page_number">
-            <td class="text-center">{{tarea.id}}</td>
             <td class="text-center">{{tarea.titulo}}</td>
             <td class="text-center">{{tarea.descripcion}}</td>
             <td class="text-center">{{tarea.fechaMax | date: "shortDate"}}</td>

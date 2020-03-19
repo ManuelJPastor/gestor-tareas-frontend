@@ -13,36 +13,59 @@ import { Sector } from 'src/app/settings/sectores/sector';
 })
 export class TareasFormComponent implements OnInit {
 
-  private tarea: Tarea = new Tarea();
   private tituloCrear:string = "Crear Tarea";
   private tituloEditar:string = "Editar Tarea";
+  private tarea: Tarea = new Tarea();
+
+  private isTareaPadre: boolean = false;
 
   private errores: string[];
 
   private sectores: Sector[];
+  private tareasPadre: Tarea[];
 
   constructor(private tareaService: TareaService, private sectorService: SectorService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
+    this.tarea.tareaPadre = new Tarea();
     this.cargarTarea();
     this.sectorService.getSectores().subscribe(sectores => this.sectores = sectores);
+    this.tareaService.getTareasPadre().subscribe(tareas => {
+      this.tareasPadre = tareas;
+      this.tareasPadre = this.tareasPadre.filter(tareaPadre => tareaPadre.id != this.tarea.id)
+    });
+  }
+
+  checkboxTareaPadre(): void{
+    this.isTareaPadre = !this.isTareaPadre;
+    if(!this.isTareaPadre){
+      this.tarea.tareaPadre=new Tarea();
+    } else{
+      this.tarea.tareaPadre = null;
+    }
   }
 
   cargarTarea(): void{
     this.activatedRoute.params.subscribe(params => {
       let id = params['id']
       if(id){
-        this.tareaService.getTarea(id).subscribe( tarea => this.tarea = tarea)
+        this.tareaService.getTarea(id).subscribe( tarea => {
+          this.tarea = tarea;
+          if(this.tarea.tareaPadre==null){
+            this.isTareaPadre = true;
+          }
+        })
       }
     })
   }
 
-  editarSector(): void{
-    this.tarea.sector = this.sectores.find(sector => sector.sector == this.tarea.sector.sector)
+  completarJsonTarea(): void{
+    this.tarea.tareaPadre = this.tareasPadre.find(tareaPadre => tareaPadre.id == this.tarea.tareaPadre.id);
+    this.tarea.sector = this.tarea.tareaPadre.sector;
   }
 
   create(): void{
-    this.editarSector()
+    this.completarJsonTarea()
     this.tareaService.create(this.tarea).subscribe(response => {
       this.router.navigate(['/tareas'])
       Swal.fire('Nueva Tarea',`${response.mensaje}: ${response.tarea.titulo}`, 'success')
@@ -54,7 +77,7 @@ export class TareasFormComponent implements OnInit {
   }
 
   update(): void{
-    this.editarSector()
+    this.completarJsonTarea()
     this.tareaService.update(this.tarea).subscribe(response => {
       this.router.navigate(['tareas'])
       Swal.fire('Tarea Actualizada',`${response.mensaje}: ${response.tarea.titulo}`, 'success')

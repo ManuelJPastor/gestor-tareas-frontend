@@ -9,5 +9,7 @@ export class Tarea {
   espacio: String;
   estado: String;
   sector: Sector = new Sector();
+  tareaPadre: Tarea;
+  tareasPrecedentes: Array<Tarea> = new Array<Tarea>();
   usuarios: Usuario[] = new Array<Usuario>();
 }

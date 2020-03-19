@@ -37,6 +37,10 @@ export class TareaService {
     return this.http.get<Tarea[]>(`${this.urlEndPoint}/mistareas/${id}`, {headers: this.httpHeaders});
   }
 
+  getTareasPadre(): Observable<Tarea[]> {
+    return this.http.get<Tarea[]>(`${this.urlEndPoint}/tareasPadre`, {headers: this.httpHeaders});
+  }
+
   create(tarea: Tarea) : Observable<any> {
     return this.http.post<any>(this.urlEndPoint, tarea, {headers: this.httpHeaders}).pipe(
       catchError(e => {

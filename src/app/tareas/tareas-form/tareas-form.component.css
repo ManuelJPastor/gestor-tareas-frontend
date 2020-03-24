@@ -1,0 +1,8 @@
+ng-multiselect-dropdown .dropdown-list {
+   position: relative!important;
+   margin-top: 0px!important;
+}
+
+ng-multiselect-dropdown .dropdown-btn{
+  background-color: white;
+}

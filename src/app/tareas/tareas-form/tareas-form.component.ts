@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Tarea } from '../tarea';
 import { TareaService } from '../tarea.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,20 +9,25 @@ import { Sector } from 'src/app/settings/sectores/sector';
 @Component({
   selector: 'app-tareas-form',
   templateUrl: './tareas-form.component.html',
-  styleUrls: ['./tareas-form.component.css']
+  styleUrls: ['./tareas-form.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class TareasFormComponent implements OnInit {
 
   private tituloCrear:string = "Crear Tarea";
   private tituloEditar:string = "Editar Tarea";
-  private tarea: Tarea = new Tarea();
-
-  private isTareaPadre: boolean = false;
-
   private errores: string[];
 
+  private tarea: Tarea = new Tarea();
   private sectores: Sector[];
   private tareasPadre: Tarea[];
+
+  private ramaTareas: Tarea[] = [];
+  private dropdownSettings:any = {};
+
+  private idsExclusion: number[];
+  private tareasPrecedentes: Tarea[] = [];
+
 
   constructor(private tareaService: TareaService, private sectorService: SectorService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
@@ -34,15 +39,108 @@ export class TareasFormComponent implements OnInit {
       this.tareasPadre = tareas;
       this.tareasPadre = this.tareasPadre.filter(tareaPadre => tareaPadre.id != this.tarea.id)
     });
+    this.tareaService.getTareas().subscribe(tareas => {this.ramaTareas = tareas, this.actualizarTareasPrecedentes()});
+
+    this.dropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      textField: 'titulo',
+      enableCheckAll: false,
+      itemsShowLimit: 3,
+      allowSearchFilter: true,
+      searchPlaceholderText: 'Buscar aquí..',
+      maxHeight: 150
+    }
   }
 
-  checkboxTareaPadre(): void{
-    this.isTareaPadre = !this.isTareaPadre;
-    if(!this.isTareaPadre){
-      this.tarea.tareaPadre=new Tarea();
-    } else{
-      this.tarea.tareaPadre = null;
+  onTareaSelect(tarea: Tarea){
+    this.actualizarTareasPrecedentes();
+    console.log('onItemSelect', this.tarea);
+  }
+
+  onItemDeSelect(tarea: any){
+    this.actualizarTareasPrecedentes();
+  }
+
+  onDropDownClose(){
+  }
+
+
+  actualizarTareasPrecedentes(): void{
+    this.completarTareasPrecedentes();
+    this.idsExclusion=[]
+    this.tarea.tareasPrecedentes.forEach( tareaPrecedente => {
+      this.obtenerIdsExclusion(tareaPrecedente);
+    })
+    this.tareasPrecedentes = this.ramaTareas.filter(tarea=>!this.idsExclusion.includes(tarea.id));
+
+    let tareasExclusion: Tarea[] = [];
+    this.tarea.tareasPrecedentes.forEach( tareaPrecedente => {
+      console.log("tareaPrecedente",tareaPrecedente.id)
+      if(this.idsExclusion.includes(tareaPrecedente.id)){
+        tareasExclusion.push(tareaPrecedente)
+      }
+    })
+    tareasExclusion.forEach(tarea => {
+      this.tarea.tareasPrecedentes.splice(this.tarea.tareasPrecedentes.indexOf(tarea), 1);
+    })
+
+
+  }
+
+  obtenerIdsExclusion(tarea:Tarea): void{
+    tarea.tareasPrecedentes.forEach(tareaPrecedente => {
+      if(tareaPrecedente.tareasPrecedentes.length!=0){
+        this.obtenerIdsExclusion(tareaPrecedente)
+      }
+      this.idsExclusion.push(tareaPrecedente.id);
+    })
+
+
+  }
+
+  /*comprobarTareasPrecedentes(): void {
+    this.tarea.tareasPrecedentes.forEach(tareaActual => {
+      this.tarea.tareasPrecedentes.filter(tareaExcluyente => tareaExcluyente.id!=tareaActual.id)
+        .forEach(tareaBusqueda => {
+          if(tareaBusqueda.tareasPrecedentes.length!=0){
+            if(this.buscarConflictoTareasPrecedentes(tareaActual, tareaBusqueda)){
+              this.tarea.tareasPrecedentes.splice(this.tarea.tareasPrecedentes.indexOf(tareaActual), 1);
+            }
+          }
+        })
+    })
+  }
+
+  buscarConflictoTareasPrecedentes(tareaActual: Tarea, tareaBusqueda: Tarea): boolean{
+    let conflicto:boolean=false;
+    tareaBusqueda.tareasPrecedentes.forEach(tareaPrecedente => {
+      if(tareaPrecedente.tareasPrecedentes.length!=0){
+        if(this.buscarConflictoTareasPrecedentes(tareaActual, tareaPrecedente)){
+          conflicto=true;
+        }
+      }
+      if(tareaPrecedente.id==tareaActual.id){
+        conflicto=true;
+      }
+    })
+    return conflicto;
+  }*/
+
+  completarJsonTarea(): void{
+    if(this.tarea.tareaPadre.id==null){
+      this.tarea.tareaPadre=null;
+      this.tarea.sector=null;
+    }else{
+      this.tarea.tareaPadre = this.tareasPadre.find(tareaPadre => tareaPadre.id == this.tarea.tareaPadre.id);
     }
+    this.completarTareasPrecedentes();
+  }
+
+  completarTareasPrecedentes(): void{
+    let ids : Array<Number> = [];
+    this.tarea.tareasPrecedentes.forEach(tareaPrecedente => ids.push(tareaPrecedente.id));
+    this.tarea.tareasPrecedentes = this.ramaTareas.filter(tarea => ids.includes(tarea.id));
   }
 
   cargarTarea(): void{
@@ -51,17 +149,9 @@ export class TareasFormComponent implements OnInit {
       if(id){
         this.tareaService.getTarea(id).subscribe( tarea => {
           this.tarea = tarea;
-          if(this.tarea.tareaPadre==null){
-            this.isTareaPadre = true;
-          }
         })
       }
     })
-  }
-
-  completarJsonTarea(): void{
-    this.tarea.tareaPadre = this.tareasPadre.find(tareaPadre => tareaPadre.id == this.tarea.tareaPadre.id);
-    this.tarea.sector = this.tarea.tareaPadre.sector;
   }
 
   create(): void{

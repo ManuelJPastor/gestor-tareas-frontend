@@ -23,7 +23,7 @@ import { FormsModule } from '@angular/forms';
 import { SettingsComponent } from './settings/settings.component';
 import { SectoresComponent } from './settings/sectores/sectores.component';
 import { SectoresFormComponent } from './settings/sectores/sectores-form/sectores-form.component';
-
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 const routes: Routes = [
   {path: '', redirectTo: '/usuarios', pathMatch: 'full'},
@@ -64,7 +64,8 @@ const routes: Routes = [
     HttpClientModule,
     RouterModule.forRoot(routes),
     BrowserAnimationsModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    NgMultiSelectDropDownModule.forRoot()
   ],
     providers: [UsuarioService, AuthenticationService, {provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl} /*{
       provide: HTTP_INTERCEPTORS,

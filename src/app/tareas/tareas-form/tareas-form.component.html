@@ -14,7 +14,7 @@
       <div class="form-group row">
         <label for="titulo" class="col-form-label col-sm-2">Título</label>
         <div class="col-sm-8">
-          <input type="text" class="form-control" [(ngModel)]="tarea.titulo" name="titulo" required maxlength="50" #titulo="ngModel">
+          <input type="text" class="form-control" [(ngModel)]="tarea.titulo" [placeholder]="'Introduzca el título'" name="titulo" required maxlength="50" #titulo="ngModel">
           <div class="alert alert-danger" *ngIf="titulo.invalid && (titulo.dirty || titulo.touched)">
             <div *ngIf="titulo.errors.required">
               Titulo es requerido.
@@ -29,7 +29,7 @@
       <div class="form-group row">
         <label for="descripcion" class="col-form-label col-sm-2">Descripción</label>
         <div class="col-sm-8">
-          <textarea type="text" class="form-control" [(ngModel)]="tarea.descripcion" name="descripcion" rows="2"></textarea>
+          <textarea type="text" class="form-control" [(ngModel)]="tarea.descripcion" [placeholder]="'Introduzca la descripción'" name="descripcion" rows="2"></textarea>
         </div>
       </div>
 
@@ -48,34 +48,52 @@
       <div class="form-group row">
         <label for="espacio" class="col-form-label col-sm-2">Espacio</label>
         <div class="col-sm-8">
-          <input type="text" class="form-control" [(ngModel)]="tarea.espacio" name="espacio">
+          <input type="text" class="form-control" [(ngModel)]="tarea.espacio" [placeholder]="'Introduzca el espacio'" name="espacio">
         </div>
       </div>
 
       <div class="form-group row">
-        <div class="col-sm-10 offset-sm-2">
-          <div class="form-check col-form-label">
-            <input type="checkbox" class="form-check-input" id="checkTareaPadre" [checked]="isTareaPadre" (change)="checkboxTareaPadre()">
-            <label class="form-check-label" for="checkTareaPadre">¿Es una tarea padre?</label>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group row" *ngIf="!isTareaPadre">
         <label for="sector" class="col-form-label col-sm-2">Tarea padre</label>
         <div class="col-sm-8"S>
-          <select class="form-control" [(ngModel)]="tarea.tareaPadre.id" name="tareaPadre" required #tareaPadre="ngModel">
+          <select class="form-control" [(ngModel)]="tarea.tareaPadre.id" name="tareaPadre" [placeholder]="'Seleccione la tarea padre perteneciente'" required #tareaPadre="ngModel">
             <option *ngFor="let tareaPadre of tareasPadre" [value]="tareaPadre.id">{{tareaPadre.titulo}}</option>
           </select>
         </div>
       </div>
 
-      <div class="form-group row" *ngIf="isTareaPadre">
+      <div class="form-group row" *ngIf="this.tarea.tareaPadre.id!=null">
         <label for="sector" class="col-form-label col-sm-2">Sector</label>
         <div class="col-sm-8">
-          <select class="form-control" [(ngModel)]="tarea.sector.id" name="sector" required #sector="ngModel">
+          <select class="form-control" [(ngModel)]="tarea.sector.id" [placeholder]="'Seleccione el sector correspondiente'" name="sector" required #sector="ngModel">
             <option *ngFor="let sector of sectores" [value]="sector.id">{{sector.sector}}</option>
           </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="tareasPrecedentes" class="col-form-label col-sm-2">Tareas Precedentes</label>
+        <div class="col-sm-8">
+          <!--<select class="form-control mdb-select colorful-select dropdown-primary md-form" [(ngModel)]="tareasPrecedentes" name="tareasPrecedentes" multiple searchable="Buscar aquí..">
+            <option *ngFor="let tarea of ramaTareas" [value]="tarea.id">{{tarea.titulo}}</option>
+            <option [value]="1">1</option>
+            <option [value]="2">2</option>
+            <option [value]="3">3</option>
+          </select>
+          <label class="mdb-main-label">Tareas Precedentes</label>
+          <button class="btn-save btn btn-primary btn-sm">Save</button>-->
+
+        <ng-multiselect-dropdown class="text-dark"
+        [placeholder]="'Seleccione las tareas precedentes'"
+        name="tareasPrecedentes"
+        [data]="tareasPrecedentes"
+        [(ngModel)]="tarea.tareasPrecedentes"
+        [settings]="dropdownSettings"
+        (onSelect)="onTareaSelect($event)"
+        (onDeSelect)="onItemDeSelect($event)"
+        (onDropDownClose)="onDropDownClose()">
+        </ng-multiselect-dropdown>
+
+        <!--<option *ngFor="let tarea of ramaTareas" [value]="tarea.id">{{tarea.titulo}}</option>-->
         </div>
       </div>
 

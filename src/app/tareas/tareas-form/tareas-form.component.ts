@@ -19,29 +19,23 @@ export class TareasFormComponent implements OnInit {
   private errores: string[];
 
   private tarea: Tarea = new Tarea();
+
   private sectores: Sector[];
   private tareasPadre: Tarea[];
-
   private ramaTareas: Tarea[] = [];
-  private dropdownSettings:any = {};
-
-  private idsExclusion: number[];
   private tareasPrecedentes: Tarea[] = [];
 
+  private idsExclusion: number[];
+
+  private selectTareasPrecedentes:any = {};
+  private selectSector:any = {};
 
   constructor(private tareaService: TareaService, private sectorService: SectorService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
-    this.tarea.tareaPadre = new Tarea();
     this.cargarTarea();
-    this.sectorService.getSectores().subscribe(sectores => this.sectores = sectores);
-    this.tareaService.getTareasPadre().subscribe(tareas => {
-      this.tareasPadre = tareas;
-      this.tareasPadre = this.tareasPadre.filter(tareaPadre => tareaPadre.id != this.tarea.id)
-    });
-    this.tareaService.getTareas().subscribe(tareas => {this.ramaTareas = tareas, this.actualizarTareasPrecedentes()});
 
-    this.dropdownSettings = {
+    this.selectTareasPrecedentes = {
       singleSelection: false,
       idField: 'id',
       textField: 'titulo',
@@ -49,22 +43,30 @@ export class TareasFormComponent implements OnInit {
       itemsShowLimit: 3,
       allowSearchFilter: true,
       searchPlaceholderText: 'Buscar aquí..',
-      maxHeight: 150
+      maxHeight: 150,
+      noDataAvailablePlaceholderText: 'No se encuentran registros'
     }
   }
-
   onTareaSelect(tarea: Tarea){
     this.actualizarTareasPrecedentes();
-    console.log('onItemSelect', this.tarea);
+    console.log(this.tarea)
   }
-
   onItemDeSelect(tarea: any){
     this.actualizarTareasPrecedentes();
   }
 
-  onDropDownClose(){
+  vaciarTareaPadre(){
+    this.tarea.tareaPadre = new Tarea();
+    this.tarea.tareasPrecedentes = [];
+    this.ramaTareas = [];
+    this.actualizarTareasPrecedentes();
   }
 
+  cargarRamaTareas(){
+    if(this.tarea.tareaPadre.id!=null){
+      this.tareaService.getSubTareas(this.tarea.tareaPadre.id).subscribe(tareas => {this.ramaTareas = tareas, this.actualizarTareasPrecedentes()});
+    }
+  }
 
   actualizarTareasPrecedentes(): void{
     this.completarTareasPrecedentes();
@@ -72,11 +74,10 @@ export class TareasFormComponent implements OnInit {
     this.tarea.tareasPrecedentes.forEach( tareaPrecedente => {
       this.obtenerIdsExclusion(tareaPrecedente);
     })
-    this.tareasPrecedentes = this.ramaTareas.filter(tarea=>!this.idsExclusion.includes(tarea.id));
+    this.tareasPrecedentes = this.ramaTareas.filter(tarea=>!this.idsExclusion.includes(tarea.id) && tarea.id!=this.tarea.id);
 
     let tareasExclusion: Tarea[] = [];
     this.tarea.tareasPrecedentes.forEach( tareaPrecedente => {
-      console.log("tareaPrecedente",tareaPrecedente.id)
       if(this.idsExclusion.includes(tareaPrecedente.id)){
         tareasExclusion.push(tareaPrecedente)
       }
@@ -84,8 +85,6 @@ export class TareasFormComponent implements OnInit {
     tareasExclusion.forEach(tarea => {
       this.tarea.tareasPrecedentes.splice(this.tarea.tareasPrecedentes.indexOf(tarea), 1);
     })
-
-
   }
 
   obtenerIdsExclusion(tarea:Tarea): void{
@@ -95,42 +94,11 @@ export class TareasFormComponent implements OnInit {
       }
       this.idsExclusion.push(tareaPrecedente.id);
     })
-
-
   }
-
-  /*comprobarTareasPrecedentes(): void {
-    this.tarea.tareasPrecedentes.forEach(tareaActual => {
-      this.tarea.tareasPrecedentes.filter(tareaExcluyente => tareaExcluyente.id!=tareaActual.id)
-        .forEach(tareaBusqueda => {
-          if(tareaBusqueda.tareasPrecedentes.length!=0){
-            if(this.buscarConflictoTareasPrecedentes(tareaActual, tareaBusqueda)){
-              this.tarea.tareasPrecedentes.splice(this.tarea.tareasPrecedentes.indexOf(tareaActual), 1);
-            }
-          }
-        })
-    })
-  }
-
-  buscarConflictoTareasPrecedentes(tareaActual: Tarea, tareaBusqueda: Tarea): boolean{
-    let conflicto:boolean=false;
-    tareaBusqueda.tareasPrecedentes.forEach(tareaPrecedente => {
-      if(tareaPrecedente.tareasPrecedentes.length!=0){
-        if(this.buscarConflictoTareasPrecedentes(tareaActual, tareaPrecedente)){
-          conflicto=true;
-        }
-      }
-      if(tareaPrecedente.id==tareaActual.id){
-        conflicto=true;
-      }
-    })
-    return conflicto;
-  }*/
 
   completarJsonTarea(): void{
     if(this.tarea.tareaPadre.id==null){
       this.tarea.tareaPadre=null;
-      this.tarea.sector=null;
     }else{
       this.tarea.tareaPadre = this.tareasPadre.find(tareaPadre => tareaPadre.id == this.tarea.tareaPadre.id);
     }
@@ -144,18 +112,35 @@ export class TareasFormComponent implements OnInit {
   }
 
   cargarTarea(): void{
+    this.tarea.tareaPadre = new Tarea();
+    this.sectorService.getSectores().subscribe(sectores => this.sectores = sectores);
+    this.tareaService.getTareasPadre().subscribe(tareas => {
+      this.tareasPadre = tareas;
+    });
+
     this.activatedRoute.params.subscribe(params => {
       let id = params['id']
       if(id){
         this.tareaService.getTarea(id).subscribe( tarea => {
           this.tarea = tarea;
+          if(this.tarea.tareaPadre!=null){
+            this.cargarRamaTareas();
+          }else{
+            this.tarea.tareaPadre=new Tarea();
+          }
+          this.tareaService.getTareasPadre().subscribe(tareas => {
+            this.tareasPadre = tareas.filter(tareaPadre => tareaPadre.id != this.tarea.id)
+          });
+          this.tareasPadre = this.tareasPadre.filter(tareaPadre => tareaPadre.id != this.tarea.id)
         })
+
       }
     })
   }
 
   create(): void{
     this.completarJsonTarea()
+
     this.tareaService.create(this.tarea).subscribe(response => {
       this.router.navigate(['/tareas'])
       Swal.fire('Nueva Tarea',`${response.mensaje}: ${response.tarea.titulo}`, 'success')
@@ -168,6 +153,7 @@ export class TareasFormComponent implements OnInit {
 
   update(): void{
     this.completarJsonTarea()
+    console.log("create", this.tarea)
     this.tareaService.update(this.tarea).subscribe(response => {
       this.router.navigate(['tareas'])
       Swal.fire('Tarea Actualizada',`${response.mensaje}: ${response.tarea.titulo}`, 'success')

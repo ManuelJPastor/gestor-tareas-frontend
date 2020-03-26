@@ -49,7 +49,6 @@ export class TareasFormComponent implements OnInit {
   }
   onTareaSelect(tarea: Tarea){
     this.actualizarTareasPrecedentes();
-    console.log(this.tarea)
   }
   onItemDeSelect(tarea: any){
     this.actualizarTareasPrecedentes();
@@ -71,10 +70,15 @@ export class TareasFormComponent implements OnInit {
   actualizarTareasPrecedentes(): void{
     this.completarTareasPrecedentes();
     this.idsExclusion=[]
+
     this.tarea.tareasPrecedentes.forEach( tareaPrecedente => {
       this.obtenerIdsExclusion(tareaPrecedente);
     })
-    this.tareasPrecedentes = this.ramaTareas.filter(tarea=>!this.idsExclusion.includes(tarea.id) && tarea.id!=this.tarea.id);
+    console.log("include",this.idsExclusion.indexOf(2)!=-1)
+
+    console.log(this.ramaTareas.filter(tarea => {this.idsExclusion.includes(2), console.log(this.idsExclusion)}))
+    this.tareasPrecedentes = this.ramaTareas.filter(tarea => !this.idsExclusion.includes(tarea.id) && tarea.id!=this.tarea.id);
+
 
     let tareasExclusion: Tarea[] = [];
     this.tarea.tareasPrecedentes.forEach( tareaPrecedente => {
@@ -88,11 +92,17 @@ export class TareasFormComponent implements OnInit {
   }
 
   obtenerIdsExclusion(tarea:Tarea): void{
-    tarea.tareasPrecedentes.forEach(tareaPrecedente => {
-      if(tareaPrecedente.tareasPrecedentes.length!=0){
-        this.obtenerIdsExclusion(tareaPrecedente)
-      }
-      this.idsExclusion.push(tareaPrecedente.id);
+    this.tareaService.getTareasPrecedentes(tarea.id).subscribe(tareasPrecedentes => {
+      tarea.tareasPrecedentes = tareasPrecedentes;
+      tarea.tareasPrecedentes.forEach(tareaPrecedente => {
+        this.tareaService.getTareasPrecedentes(tareaPrecedente.id).subscribe(tareasPrecedentes2 => {
+          tareaPrecedente.tareasPrecedentes = tareasPrecedentes2
+          if(tareaPrecedente.tareasPrecedentes.length!=0){
+            this.obtenerIdsExclusion(tareaPrecedente)
+          }
+          this.idsExclusion.push(tareaPrecedente.id);
+        })
+      })
     })
   }
 
@@ -123,15 +133,21 @@ export class TareasFormComponent implements OnInit {
       if(id){
         this.tareaService.getTarea(id).subscribe( tarea => {
           this.tarea = tarea;
-          if(this.tarea.tareaPadre!=null){
-            this.cargarRamaTareas();
-          }else{
-            this.tarea.tareaPadre=new Tarea();
-          }
-          this.tareaService.getTareasPadre().subscribe(tareas => {
-            this.tareasPadre = tareas.filter(tareaPadre => tareaPadre.id != this.tarea.id)
-          });
-          this.tareasPadre = this.tareasPadre.filter(tareaPadre => tareaPadre.id != this.tarea.id)
+          this.tareaService.getTareasPrecedentes(this.tarea.id).subscribe(tareasPrecedentes=>{
+            this.tarea.tareasPrecedentes = tareasPrecedentes;
+
+            if(this.tarea.tareaPadre!=null){
+              this.cargarRamaTareas();
+            }else{
+              this.tarea.tareaPadre=new Tarea();
+            }
+            this.tareaService.getTareasPadre().subscribe(tareas => {
+              this.tareasPadre = tareas.filter(tareaPadre => tareaPadre.id != this.tarea.id)
+            });
+            this.tareasPadre = this.tareasPadre.filter(tareaPadre => tareaPadre.id != this.tarea.id)
+
+          })
+
         })
 
       }

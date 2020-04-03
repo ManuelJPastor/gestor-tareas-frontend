@@ -24,6 +24,7 @@ import { SettingsComponent } from './settings/settings.component';
 import { SectoresComponent } from './settings/sectores/sectores.component';
 import { SectoresFormComponent } from './settings/sectores/sectores-form/sectores-form.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { TareasRamaComponent } from './tareas/tareas-rama/tareas-rama.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/usuarios', pathMatch: 'full'},
@@ -40,6 +41,7 @@ const routes: Routes = [
   {path: 'settings/sectores', component: SectoresComponent},
   {path: 'settings/sectores/form', component: SectoresFormComponent},
   {path: 'settings/sectores/form/:id', component: SectoresFormComponent},
+  {path: 'tareas/rama/:id', component: TareasRamaComponent},
 ];
 
 @NgModule({
@@ -56,7 +58,8 @@ const routes: Routes = [
     TareasFormComponent,
     SettingsComponent,
     SectoresComponent,
-    SectoresFormComponent
+    SectoresFormComponent,
+    TareasRamaComponent
   ],
   imports: [
     BrowserModule,

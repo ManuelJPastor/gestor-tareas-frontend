@@ -45,6 +45,10 @@ export class TareaService {
     return this.http.get<Tarea[]>(`${this.urlEndPoint}/subTareas/${id}`, {headers: this.httpHeaders});
   }
 
+  getRamaTareas(id): Observable<Tarea[]> {
+    return this.http.get<Tarea[]>(`${this.urlEndPoint}/ramaTareas/${id}`, {headers: this.httpHeaders});
+  }
+
   getTareasPrecedentes(id): Observable<Tarea[]> {
     return this.http.get<Tarea[]>(`${this.urlEndPoint}/tareasPrecedentes/${id}`, {headers: this.httpHeaders});
   }

@@ -49,7 +49,6 @@ export class TareasFormComponent implements OnInit {
   }
   onTareaSelect(tarea: Tarea){
     this.actualizarTareasPrecedentes();
-    console.log(this.tarea)
   }
   onItemDeSelect(tarea: any){
     this.actualizarTareasPrecedentes();
@@ -58,13 +57,15 @@ export class TareasFormComponent implements OnInit {
   vaciarTareaPadre(){
     this.tarea.tareaPadre = new Tarea();
     this.tarea.tareasPrecedentes = [];
-    this.ramaTareas = [];
-    this.actualizarTareasPrecedentes();
+    this.cargarRamaTareas();
   }
 
   cargarRamaTareas(){
     if(this.tarea.tareaPadre.id!=null){
       this.tareaService.getSubTareas(this.tarea.tareaPadre.id).subscribe(tareas => {this.ramaTareas = tareas, this.actualizarTareasPrecedentes()});
+    } else{
+      this.ramaTareas = this.tareasPadre;
+      this.actualizarTareasPrecedentes();
     }
   }
 
@@ -116,26 +117,27 @@ export class TareasFormComponent implements OnInit {
     this.sectorService.getSectores().subscribe(sectores => this.sectores = sectores);
     this.tareaService.getTareasPadre().subscribe(tareas => {
       this.tareasPadre = tareas;
+
+      this.activatedRoute.params.subscribe(params => {
+        let id = params['id']
+        if(id){
+          this.tareaService.getTarea(id).subscribe( tarea => {
+            this.tarea = tarea;
+            if(this.tarea.tareaPadre==null){
+              this.tarea.tareaPadre=new Tarea();
+              this.tarea.tareaPadre.id = null;
+            }
+            this.tareasPadre = this.tareasPadre.filter(tareaPadre => tareaPadre.id != this.tarea.id)
+            this.cargarRamaTareas();
+          })
+        } else{
+          this.cargarRamaTareas();
+        }
+
+      })
     });
 
-    this.activatedRoute.params.subscribe(params => {
-      let id = params['id']
-      if(id){
-        this.tareaService.getTarea(id).subscribe( tarea => {
-          this.tarea = tarea;
-          if(this.tarea.tareaPadre!=null){
-            this.cargarRamaTareas();
-          }else{
-            this.tarea.tareaPadre=new Tarea();
-          }
-          this.tareaService.getTareasPadre().subscribe(tareas => {
-            this.tareasPadre = tareas.filter(tareaPadre => tareaPadre.id != this.tarea.id)
-          });
-          this.tareasPadre = this.tareasPadre.filter(tareaPadre => tareaPadre.id != this.tarea.id)
-        })
 
-      }
-    })
   }
 
   create(): void{
@@ -153,7 +155,6 @@ export class TareasFormComponent implements OnInit {
 
   update(): void{
     this.completarJsonTarea()
-    console.log("create", this.tarea)
     this.tareaService.update(this.tarea).subscribe(response => {
       this.router.navigate(['tareas'])
       Swal.fire('Tarea Actualizada',`${response.mensaje}: ${response.tarea.titulo}`, 'success')

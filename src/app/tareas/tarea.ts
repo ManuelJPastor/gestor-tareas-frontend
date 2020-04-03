@@ -5,8 +5,10 @@ export class Tarea {
   id: number;
   titulo: string;
   descripcion: string;
-  fechaMax: Date;
   espacio: String;
+  fechaMax: Date;
+  dias: number;
+  nivel: number;
   estado: String;
   sector: Sector = new Sector();
   tareaPadre: Tarea;

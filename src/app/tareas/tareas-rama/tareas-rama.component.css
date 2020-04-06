@@ -1,12 +1,1 @@
-.cuadrado{
-  width: 90%;
-}
-.cuadrado:before {
-   content: '';
-   display: block;
-   padding-top: 100%;
- }
 
-li{
-  width: 20%;
-}

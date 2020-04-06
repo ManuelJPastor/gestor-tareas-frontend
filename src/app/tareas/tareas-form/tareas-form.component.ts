@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { SectorService } from 'src/app/settings/sectores/sector.service';
 import { Sector } from 'src/app/settings/sectores/sector';
+import { DataSet, Network } from 'vis';
 
 @Component({
   selector: 'app-tareas-form',
@@ -30,6 +31,11 @@ export class TareasFormComponent implements OnInit {
   private selectTareasPrecedentes:any = {};
   private selectSector:any = {};
 
+  private data:any;
+  private options:any;
+  private network: Network;
+  private isNetwork: boolean = false;
+
   constructor(private tareaService: TareaService, private sectorService: SectorService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
@@ -47,6 +53,110 @@ export class TareasFormComponent implements OnInit {
       noDataAvailablePlaceholderText: 'No se encuentran registros'
     }
   }
+
+  cargarAjustesNetwork(){
+
+      var nodes = new DataSet<any>();
+      var edges = new DataSet<any>();
+
+      this.tareasPadre.forEach(tareaPadre => {
+        var node = {id: tareaPadre.id, label: tareaPadre.titulo, level: tareaPadre.nivel};
+        nodes.add(node);
+        tareaPadre.tareasPrecedentes.forEach(tareaPrecedente => {
+          var edge = {from: tareaPadre.id, to: tareaPrecedente.id};
+          edges.add(edge);
+        })
+      })
+        this.data = {
+          nodes: nodes,
+          edges: edges
+        };
+
+        this.options = {
+          autoResize: false,
+          width: '100%',
+          nodes: {
+            shape: "box",
+            margin: {
+              top: 10,
+              right: 10,
+              bottom: 10,
+              left: 10
+            },
+            widthConstraint: {
+              maximum: 200
+            }
+          },
+          edges: {
+            width: 3
+          },
+          layout: {
+            hierarchical: {
+                direction: 'UD',
+                nodeSpacing: 250,
+                parentCentralization: false
+            }
+          },
+          interaction: {
+            dragNodes: false,
+            dragView: false,
+            multiselect: false,
+            zoomView: false,
+            selectConnectedEdges: false
+          },
+          /*configure: {
+            showButton: true
+          },
+          locale: 'es',
+          manipulation: {
+
+          }*/
+
+        };
+  }
+
+  ramaTareaPadre():void{
+    if(this.tareasPadre[0].tareaPadre!=null){
+      this.tareaService.getRamaTareas(this.tareasPadre[0].tareaPadre.id).subscribe(tareasPadre => {
+        this.tareasPadre = tareasPadre;
+        this.cargarAjustesNetwork();
+        this.crearNetwork();
+      })
+    }
+
+  }
+
+  abrirSubtareas(): void{
+    if(this.network.getSelectedNodes().length!=0){
+      this.tareaService.getSubTareas(this.network.getSelectedNodes()[0]).subscribe(tareasPadre => {
+        if(tareasPadre.length!=0){
+          this.tareasPadre = tareasPadre;
+          this.cargarAjustesNetwork();
+          this.crearNetwork();
+        }
+      })
+    }
+
+  }
+
+  seleccionarTareaPadre(): void{
+    if(this.network.getSelectedNodes().length!=0){
+      this.tarea.tareaPadre = this.tareasPadre.find(tareaPadre => tareaPadre.id == this.network.getSelectedNodes()[0])
+      this.cargarRamaTareas();
+    }
+  }
+
+  crearNetwork(): void{
+    this.isNetwork = true;
+    var container = document.getElementById('mynetwork');
+    this.network = new Network(container, this.data, this.options);
+  }
+
+  destroyNetwork(){
+    this.isNetwork = false;
+    this.network.destroy();
+  }
+
   onTareaSelect(tarea: Tarea){
     this.actualizarTareasPrecedentes();
   }
@@ -117,6 +227,7 @@ export class TareasFormComponent implements OnInit {
     this.sectorService.getSectores().subscribe(sectores => this.sectores = sectores);
     this.tareaService.getTareasPadre().subscribe(tareas => {
       this.tareasPadre = tareas;
+      this.cargarAjustesNetwork();
 
       this.activatedRoute.params.subscribe(params => {
         let id = params['id']
@@ -127,7 +238,7 @@ export class TareasFormComponent implements OnInit {
               this.tarea.tareaPadre=new Tarea();
               this.tarea.tareaPadre.id = null;
             }
-            this.tareasPadre = this.tareasPadre.filter(tareaPadre => tareaPadre.id != this.tarea.id)
+            //this.tareasPadre = this.tareasPadre.filter(tareaPadre => tareaPadre.id != this.tarea.id)
             this.cargarRamaTareas();
           })
         } else{

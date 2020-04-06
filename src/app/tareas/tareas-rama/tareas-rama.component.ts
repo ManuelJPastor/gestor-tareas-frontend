@@ -12,14 +12,13 @@ import { Network, DataSet } from 'vis';
 export class TareasRamaComponent implements OnInit {
 
 private tareas:Tarea[];
-private nodes
+private nodes;
 
 constructor(private tareaService: TareaService) { }
 
   ngOnInit(): void {
     this.tareaService.getSubTareas(1).subscribe(tareas => {
       this.tareas = tareas;
-
 
       var nodes = new DataSet([
           {id: 2, label: 'Cambiar bombillas 1 asdf asdf asdf asdf adfd d d d d asdfa', level:1},
@@ -85,7 +84,17 @@ constructor(private tareaService: TareaService) { }
           },
           locale: 'es',
           manipulation: {
-
+            enabled: true,
+            initiallyActive: false,
+            addNode: true,
+            addEdge: true,
+            editNode: undefined,
+            editEdge: true,
+            deleteNode: true,
+            deleteEdge: true,
+            controlNodeStyle:{
+              // all node options are valid.
+            }
           }
 
         };
@@ -98,4 +107,5 @@ constructor(private tareaService: TareaService) { }
 
     })
   }
+
 }

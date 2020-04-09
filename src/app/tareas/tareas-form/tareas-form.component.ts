@@ -247,8 +247,6 @@ export class TareasFormComponent implements OnInit {
 
       })
     });
-
-
   }
 
   create(): void{

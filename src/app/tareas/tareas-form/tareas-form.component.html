@@ -6,7 +6,7 @@
 <div class="card bg-dark text-white">
   <div class="card-header" *ngIf="!tarea.id else tituloBlock">{{tituloCrear}}</div>
   <ng-template #tituloBlock>
-    <div class="card-header">{{tituloEditar}}</div>
+    <div class="card-header d-flex">{{tituloEditar}}<button class="btn btn-sm btn-success ml-auto" [routerLink]="['/tareas/rama', tarea.id]">Mostrar Rama</button></div>
   </ng-template>
   <div class="card-body">
 
@@ -67,13 +67,13 @@
           <input type="text" class="form-control text-dark" [(ngModel)]="tarea.tareaPadre.titulo" disabled="true" [placeholder]="'No tiene tarea padre'" name="tareaPadre">
         </div>
         <div class="col-sm-2 d-flex">
-          <button class="btn btn-success ml-auto" role="button" (click)='crearNetwork()' *ngIf="!isNetwork else elseButton">Mostrar</button>
+          <button class="btn btn-sm btn-success ml-auto" role="button" (click)='crearNetwork()' *ngIf="!isNetwork else elseButton">Elegir</button>
           <ng-template #elseButton>
-            <button class="btn btn-secondary ml-auto" role="button" (click)='destroyNetwork()'>Ocultar</button>
+            <button class="btn btn-sm btn-secondary ml-auto" role="button" (click)='destroyNetwork()'>Ocultar</button>
           </ng-template>
         </div>
         <div class="col-sm-8 offset-sm-2 bg-white mt-2 border border-primary py-1 d-flex rounded-top" *ngIf="isNetwork">
-          <button class="btn btn-sm bg-primary text-white" (click)="ramaTareaPadre()"><i class="fa fa-chevron-left fa-2x"></i></button>
+          <button class="btn btn-sm bg-primary text-white" (click)="ramaTareaPadre()"><i class="fa fa-chevron-left"></i></button>
           <button class="btn btn-sm btn-primary ml-2" role="button" (click)='seleccionarTareaPadre()'>Seleccionar</button>
           <button class="btn btn-sm btn-primary ml-2" role="button" (click)='abrirSubtareas()'>Abrir subtareas</button>
           <button class="btn btn-sm btn-primary ml-auto" role="button" (click)='vaciarTareaPadre()'>Vaciar</button>

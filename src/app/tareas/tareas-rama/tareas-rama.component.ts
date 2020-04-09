@@ -3,6 +3,7 @@ import { TareaService } from '../tarea.service';
 import { Tarea } from '../tarea';
 import * as $ from 'jquery';
 import { Network, DataSet } from 'vis';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-tareas-rama',
@@ -11,100 +12,99 @@ import { Network, DataSet } from 'vis';
 })
 export class TareasRamaComponent implements OnInit {
 
-private tareas:Tarea[];
-private nodes;
-
-constructor(private tareaService: TareaService) { }
+constructor(private tareaService: TareaService, private activatedRoute: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
-    this.tareaService.getSubTareas(1).subscribe(tareas => {
-      this.tareas = tareas;
 
-      var nodes = new DataSet([
-          {id: 2, label: 'Cambiar bombillas 1 asdf asdf asdf asdf adfd d d d d asdfa', level:1},
-          {id: 3, label: 'Cambiar bombillas 1 asdf asdf asdf asdf adfd d d d d asdfa', level:1},
-          {id: 4, label: 'Cambiar bombillas 1 asdf asdf asdf asdf adfd d d d d asdfa', level:2},
-          {id: 5, label: 'Cambiar bombillas 1 asdf asdf asdf asdf adfd d d d d asdfa', level:2},
-          {id: 6, label: 'Cambiar bombillas 1 asdf asdf asdf asdf adfd d d d d asdfa', level:3},
-          {id: 7, label: 'Cambiar bombillas 1 asdf asdf asdf asdf adfd d d d d asdfa', level:4}
-        ]);
+    this.activatedRoute.params.subscribe(params => {
+      let id = params['id']
+      if(id){
+        this.tareaService.getRamaTareas(id).subscribe(tareas => {
+          tareas;
 
-        // create an array with edges
-        var edges = new DataSet([
-          {from: 4, to: 2},
-          {from: 4, to: 3},
-          {from: 5, to: 3},
-          {from: 6, to: 4},
-          {from: 7, to: 6},
-          {from: 7, to: 3}
-        ]);
+          var nodes = new DataSet<any>();
+          var edges = new DataSet<any>();
 
-        // create a network
-        var container = document.getElementById('mynetwork');
-        var data = {
-          nodes: nodes,
-          edges: edges
-        };
-
-        var options = {
-          autoresize: true,
-          width: '100%',
-          height: (window.innerHeight - 75) + "px",
-          nodes: {
-            shape: "box",
-            margin: {
-              top: 10,
-              right: 10,
-              bottom: 10,
-              left: 10
-            },
-            widthConstraint: {
-              maximum: 200
+          tareas.forEach(tarea => {
+            var node;
+            if(tarea.id == id){
+              node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel,
+                          color: {border: '#FE0303',  background: '#FF4444',
+                                  highlight: { border: '#FE0303', background: '#FF4444'}}};
+            } else{
+              node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel};
             }
-          },
-          edges: {
-            width: 3
-          },
-          layout: {
-            hierarchical: {
-                direction: 'UD',
-                nodeSpacing: 250,
-                parentCentralization: false
-            }
-          },
-          interaction: {
-            dragNodes: false,
-            dragView: false,
-            multiselect: true,
-            zoomView: false,
-            selectConnectedEdges: false
-          },
-          configure: {
-            showButton: true
-          },
-          locale: 'es',
-          manipulation: {
-            enabled: true,
-            initiallyActive: false,
-            addNode: true,
-            addEdge: true,
-            editNode: undefined,
-            editEdge: true,
-            deleteNode: true,
-            deleteEdge: true,
-            controlNodeStyle:{
-              // all node options are valid.
-            }
-          }
 
-        };
+            nodes.add(node);
+            tarea.tareasPrecedentes.forEach(tareaPrecedente => {
+              var edge = {from: tarea.id, to: tareaPrecedente.id};
+              edges.add(edge);
+            })
+          })
 
-        var network = new Network(container, data, options);
+            // create a network
+            var container = document.getElementById('mynetwork');
+            var data = {
+              nodes: nodes,
+              edges: edges
+            };
 
-        network.on("stabilizationIterationsDone", function () {
-            network.setOptions( { physics: false } );
-        });
+            var options = {
+              autoResize: true,
+              width: '100%',
+              height: (window.innerHeight - 150) + "px",
+              nodes: {
+                shape: "box",
+                margin: {
+                  top: 10,
+                  right: 10,
+                  bottom: 10,
+                  left: 10
+                },
+                widthConstraint: {
+                  maximum: 200
+                }
+              },
+              edges: {
+                width: 2,
+                arrows: 'from',
+                smooth: true,
+                color: {
+                  color:'#848484',
+                  highlight:'#848484',
+                  hover: '#848484',
+                  inherit: 'from',
+                  opacity:1.0
+                }
+              },
+              layout: {
+                hierarchical: {
+                    direction: 'UD',
+                    nodeSpacing: 250,
+                    parentCentralization: false
+                }
+              },
+              interaction: {
+                dragNodes: false,
+                dragView: false,
+                multiselect: false,
+                zoomView: false,
+                selectConnectedEdges: false
+              },
+              manipulation: {
+                enabled:true
+              }
+            };
 
+            var network = new Network(container, data, options);
+            network.on('doubleClick', (event)=> {
+              var nodos = event.nodes
+              if(nodos.length!=0){
+                this.router.navigate(['/tareas/form',nodos[0]])
+              }
+            })
+        })
+      }
     })
   }
 

@@ -12,6 +12,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class TareasRamaComponent implements OnInit {
 
+private nodes;
+private edges;
+private network: Network;
+
+private clusterOptionsByData = [];
+
+private ramaTareas: Tarea[];
+
 constructor(private tareaService: TareaService, private activatedRoute: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
@@ -20,13 +28,14 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
       let id = params['id']
       if(id){
         this.tareaService.getRamaTareas(id).subscribe(tareas => {
-          tareas;
+          this.ramaTareas = tareas;
 
-          var nodes = new DataSet<any>();
-          var edges = new DataSet<any>();
+          this.nodes = new DataSet<any>();
+          this.edges = new DataSet<any>();
 
           tareas.forEach(tarea => {
-            var node;
+            this.crearSubtareas(tarea)
+            /*
             if(tarea.id == id){
               node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel,
                           color: {border: '#FE0303',  background: '#FF4444',
@@ -34,19 +43,20 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
             } else{
               node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel};
             }
-
             nodes.add(node);
+
             tarea.tareasPrecedentes.forEach(tareaPrecedente => {
               var edge = {from: tarea.id, to: tareaPrecedente.id};
               edges.add(edge);
-            })
+            })*/
+
           })
 
             // create a network
             var container = document.getElementById('mynetwork');
             var data = {
-              nodes: nodes,
-              edges: edges
+              nodes: this.nodes,
+              edges: this.edges
             };
 
             var options = {
@@ -81,31 +91,147 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
                 hierarchical: {
                     direction: 'UD',
                     nodeSpacing: 250,
-                    parentCentralization: false
+                    //parentCentralization: false
                 }
               },
               interaction: {
                 dragNodes: false,
-                dragView: false,
+                //dragView: false,
                 multiselect: false,
-                zoomView: false,
+                //zoomView: false,
                 selectConnectedEdges: false
               },
               manipulation: {
                 enabled:true
+              },
+              physics:{
+                enabled: true
               }
             };
 
-            var network = new Network(container, data, options);
-            network.on('doubleClick', (event)=> {
-              var nodos = event.nodes
-              if(nodos.length!=0){
-                this.router.navigate(['/tareas/form',nodos[0]])
+
+            setTimeout( () => {
+              this.network = new Network(container, data, options);
+              this.network.on('doubleClick', (event)=> {
+                var nodos = event.nodes
+                if(nodos.length!=0){
+                  this.router.navigate(['/tareas/form',nodos[0]])
+                }
+              })
+
+              this.network.on('selectNode', (params) => {
+                if (params.nodes.length == 1) {
+                  if (this.network.isCluster(params.nodes[0]) == true) {
+                    this.network.openCluster(params.nodes[0]);
+                    this.network.stopSimulation()
+                  }
+                }
+                this.network.redraw();
+              })
+              for(var i=this.clusterOptionsByData.length-1; i>=0; i--){
+                this.network.cluster(this.clusterOptionsByData[i])
+                this.clusterOptionsByData.splice(i,1)
               }
-            })
+
+            }, 500 );
+
+
+
+            /*this.network.on('startStabilizing', ()=>{
+              if(this.clusterOptionsByData.length!=0){
+                for(var i=this.clusterOptionsByData.length-1; i>=0; i--){
+                  this.network.cluster(this.clusterOptionsByData[i])
+                  this.clusterOptionsByData.splice(i,1)
+                }
+              }
+            })*/
         })
       }
     })
+  }
+
+  crearSubtareas(tarea: Tarea): void{
+    var node;
+    this.tareaService.getSubTareas(tarea.id).subscribe(subTareas => {
+      if(subTareas.length!=0){
+
+
+        subTareas.forEach(subTarea => {
+          this.crearSubtareas(subTarea)
+        });
+
+        this.clusterOptionsByData.push({
+          joinCondition: function(childOptions) {
+            if(childOptions.tareaPadre!=null){
+              return childOptions.tareaPadre.id == tarea.id;
+            } else{
+              return false;
+            }
+
+          },
+          clusterNodeProperties: {
+            id: tarea.id,
+            borderWidth: 3,
+            shape: "box",
+            color: {
+              border: "blue"
+            },
+            allowSingleNodeCluster: true,
+            label: tarea.titulo,
+            level: tarea.nivel,
+            tareaPadre: tarea.tareaPadre
+          }
+        })
+
+      }else{
+        node = {id: tarea.id, label: tarea.titulo, level: (tarea.tareaPadre.nivel + tarea.nivel) - 1, tareaPadre: tarea.tareaPadre};
+        this.nodes.add(node);
+        tarea.tareasPrecedentes.forEach(tareaPrecedente => {
+          var edge = {from: tarea.id, to: tareaPrecedente.id};
+          this.edges.add(edge);
+        })
+      }
+
+
+
+      /*if(subTareas.length!=0){
+        subTareas.forEach(subTarea => {
+          node = {id: subTarea.id, label: subTarea.titulo, level: (tarea.nivel + subTarea.nivel) - 1, tareaPadre: subTarea.tareaPadre};
+          this.nodes.add(node);
+          subTarea.tareasPrecedentes.forEach(tareaPrecedente => {
+            var edge = {from: subTarea.id, to: tareaPrecedente.id};
+            this.edges.add(edge);
+          })
+
+        });
+        this.clusterOptionsByData={
+          joinCondition: function(childOptions) {
+            return childOptions.tareaPadre.id == tarea.id;
+          },
+          clusterNodeProperties: {
+            id: tarea.id,
+            borderWidth: 3,
+            shape: "box",
+            color: {
+              border: "blue"
+            },
+            label: tarea.titulo,
+            level: tarea.nivel,
+            tareaPadre: tarea.tareaPadre
+          }
+        }
+        this.network.cluster(this.clusterOptionsByData)
+
+
+      } else{
+        node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel, tareaPadre: tarea.tareaPadre};
+        this.nodes.add(node);
+        tarea.tareasPrecedentes.forEach(tareaPrecedente => {
+          var edge = {from: tarea.id, to: tareaPrecedente.id};
+          this.edges.add(edge);
+        })
+      }*/
+    });
   }
 
 }

@@ -67,18 +67,16 @@
           <input type="text" class="form-control text-dark" [(ngModel)]="tarea.tareaPadre.titulo" disabled="true" [placeholder]="'No tiene tarea padre'" name="tareaPadre">
         </div>
         <div class="col-sm-2 d-flex">
-          <button class="btn btn-sm btn-success ml-auto" role="button" (click)='crearNetwork()' *ngIf="!isNetwork else elseButton">Elegir</button>
+          <button class="btn btn-sm btn-success btn-network ml-auto" role="button" (click)='crearNetworkTareaPadre()' *ngIf="!openNetworkTareaPadre else elseButton">Elegir</button>
           <ng-template #elseButton>
-            <button class="btn btn-sm btn-secondary ml-auto" role="button" (click)='destroyNetwork()'>Ocultar</button>
+            <button class="btn btn-sm btn-secondary btn-network ml-auto" role="button" (click)='destroyNetworkTareaPadre()'>Ocultar</button>
           </ng-template>
         </div>
-        <div class="col-sm-8 offset-sm-2 bg-white mt-2 border border-primary py-1 d-flex rounded-top" *ngIf="isNetwork">
-          <button class="btn btn-sm bg-primary text-white" (click)="ramaTareaPadre()"><i class="fa fa-chevron-left"></i></button>
+        <div class="col-sm-8 offset-sm-2 bg-white mt-2 border border-primary py-1 d-flex rounded-top" *ngIf="openNetworkTareaPadre">
           <button class="btn btn-sm btn-primary ml-2" role="button" (click)='seleccionarTareaPadre()'>Seleccionar</button>
-          <button class="btn btn-sm btn-primary ml-2" role="button" (click)='abrirSubtareas()'>Abrir subtareas</button>
           <button class="btn btn-sm btn-primary ml-auto" role="button" (click)='vaciarTareaPadre()'>Vaciar</button>
         </div>
-        <div id="mynetwork" class="col-sm-8 offset-sm-2 bg-white text-dark border border-dark border-top-0 rounded-bottom"></div>
+        <div id="networkTareaPadre" class="col-sm-8 offset-sm-2 bg-white text-dark border border-dark border-top-0 rounded-bottom"></div>
 
 
         <!--<div class="col-sm-8">
@@ -93,17 +91,22 @@
 
       <div class="form-group row">
         <label for="tareasPrecedentes" class="col-form-label col-sm-2">Tareas Precedentes</label>
-        <div class="col-sm-8">
+        <div class="col-sm-6">
           <ng-multiselect-dropdown class="text-dark"
           [placeholder]="'Seleccione las tareas precedentes'"
           name="tareasPrecedentes"
-          [data]="tareasPrecedentes"
           [(ngModel)]="tarea.tareasPrecedentes"
-          [settings]="selectTareasPrecedentes"
-          (onSelect)="onTareaSelect($event)"
-          (onDeSelect)="onItemDeSelect($event)">
+          [data]="tarea.tareasPrecedentes"
+          [settings]="selectTareasPrecedentes">
           </ng-multiselect-dropdown>
         </div>
+        <div class="col-sm-2 d-flex">
+          <button class="btn btn-sm btn-success btn-network ml-auto" role="button" (click)='crearNetworkTareasPrecedentes()' *ngIf="!openNetworkTareasPrecedentes else elseButtonPrecedentes">Elegir</button>
+          <ng-template #elseButtonPrecedentes>
+            <button class="btn btn-sm btn-secondary btn-network ml-auto" role="button" (click)='destroyNetworkTareasPrecedentes()'>Ocultar</button>
+          </ng-template>
+        </div>
+        <div id="networkTareasPrecedentes" class="col-sm-8 offset-sm-2 bg-white text-dark border border-dark border-top-0 rounded-bottom"></div>
       </div>
 
       <div class="form-group row">

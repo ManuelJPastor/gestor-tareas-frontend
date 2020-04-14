@@ -6,3 +6,7 @@ ng-multiselect-dropdown .dropdown-list {
 ng-multiselect-dropdown .dropdown-btn{
   background-color: white;
 }
+
+.btn-network{
+  height: 40px;
+}

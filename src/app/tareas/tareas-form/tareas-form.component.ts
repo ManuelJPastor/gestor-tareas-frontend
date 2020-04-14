@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import { SectorService } from 'src/app/settings/sectores/sector.service';
 import { Sector } from 'src/app/settings/sectores/sector';
 import { DataSet, Network } from 'vis';
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-tareas-form',
@@ -22,19 +23,25 @@ export class TareasFormComponent implements OnInit {
   private tarea: Tarea = new Tarea();
 
   private sectores: Sector[];
-  private tareasPadre: Tarea[];
-  private ramaTareas: Tarea[] = [];
-  private tareasPrecedentes: Tarea[] = [];
-
-  private idsExclusion: number[];
+  private tareas: Tarea[];
+  private tareasPadre : Tarea[];
 
   private selectTareasPrecedentes:any = {};
   private selectSector:any = {};
 
-  private data:any;
+  private nodes = new DataSet<any>();
+  private edges = new DataSet<any>();
+  private data: {nodes: DataSet<any>, edges: DataSet<any>};
   private options:any;
-  private network: Network;
-  private isNetwork: boolean = false;
+
+  private networkTareaPadre: Network;
+  private openNetworkTareaPadre: boolean = false;
+
+  private networkTareasPrecedentes: Network;
+  private openNetworkTareasPrecedentes: boolean = false;
+
+  private clusterOptionsByData = [];
+
 
   constructor(private tareaService: TareaService, private sectorService: SectorService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
@@ -45,173 +52,203 @@ export class TareasFormComponent implements OnInit {
       singleSelection: false,
       idField: 'id',
       textField: 'titulo',
-      enableCheckAll: false,
       itemsShowLimit: 3,
-      allowSearchFilter: true,
-      searchPlaceholderText: 'Buscar aquí..',
       maxHeight: 150,
-      noDataAvailablePlaceholderText: 'No se encuentran registros'
+      noDataAvailablePlaceholderText: ""
     }
+
+
+  }
+
+  crearSubtareas(tarea: Tarea): void{
+    var node;
+    this.tareaService.getSubTareas(tarea.id).subscribe(subTareas => {
+      if(subTareas.length!=0){
+
+
+        subTareas.forEach(subTarea => {
+          this.crearSubtareas(subTarea)
+        });
+
+        this.clusterOptionsByData.push({
+          joinCondition: function(childOptions) {
+            if(childOptions.tareaPadre!=null){
+              return childOptions.tareaPadre.id == tarea.id;
+            } else{
+              return false;
+            }
+
+          },
+          clusterNodeProperties: {
+            id: tarea.id,
+            borderWidth: 3,
+            shape: "box",
+            color: {
+              border: "blue"
+            },
+            allowSingleNodeCluster: true,
+            label: tarea.titulo,
+            level: tarea.nivel,
+            tareaPadre: tarea.tareaPadre
+          }
+        })
+
+      }else{
+        node = {id: tarea.id, label: tarea.titulo, level: (tarea.tareaPadre.nivel + tarea.nivel) - 1, tareaPadre: tarea.tareaPadre};
+        this.nodes.add(node);
+        tarea.tareasPrecedentes.forEach(tareaPrecedente => {
+          var edge = {from: tarea.id, to: tareaPrecedente.id};
+          this.edges.add(edge);
+        })
+      }
+
+    });
   }
 
   cargarAjustesNetwork(){
+    this.tareasPadre.forEach(tarea => {
+      this.crearSubtareas(tarea)
+    })
 
-      var nodes = new DataSet<any>();
-      var edges = new DataSet<any>();
+    this.data = {
+      nodes: this.nodes,
+      edges: this.edges
+    };
 
-      this.tareasPadre.forEach(tareaPadre => {
-        var node = {id: tareaPadre.id, label: tareaPadre.titulo, level: tareaPadre.nivel};
-        nodes.add(node);
-        tareaPadre.tareasPrecedentes.forEach(tareaPrecedente => {
-          var edge = {from: tareaPadre.id, to: tareaPrecedente.id};
-          edges.add(edge);
-        })
-      })
-        this.data = {
-          nodes: nodes,
-          edges: edges
-        };
-
-        this.options = {
-          autoResize: false,
-          width: '100%',
-          nodes: {
-            shape: "box",
-            margin: {
-              top: 10,
-              right: 10,
-              bottom: 10,
-              left: 10
-            },
-            widthConstraint: {
-              maximum: 200
-            }
-          },
-          edges: {
-            width: 3
-          },
-          layout: {
-            hierarchical: {
-                direction: 'UD',
-                nodeSpacing: 250,
-                parentCentralization: false
-            }
-          },
-          interaction: {
-            dragNodes: false,
-            dragView: false,
-            multiselect: false,
-            zoomView: false,
-            selectConnectedEdges: false
-          },
-          /*configure: {
-            showButton: true
-          },
-          locale: 'es',
-          manipulation: {
-
-          }*/
-
-        };
-  }
-
-  ramaTareaPadre():void{
-    if(this.tareasPadre[0].tareaPadre!=null){
-      this.tareaService.getRamaTareas(this.tareasPadre[0].tareaPadre.id).subscribe(tareasPadre => {
-        this.tareasPadre = tareasPadre;
-        this.cargarAjustesNetwork();
-        this.crearNetwork();
-      })
-    }
-
-  }
-
-  abrirSubtareas(): void{
-    if(this.network.getSelectedNodes().length!=0){
-      this.tareaService.getSubTareas(this.network.getSelectedNodes()[0]).subscribe(tareasPadre => {
-        if(tareasPadre.length!=0){
-          this.tareasPadre = tareasPadre;
-          this.cargarAjustesNetwork();
-          this.crearNetwork();
+    this.options = {
+      autoResize: true,
+      width: '100%',
+      height: (window.innerHeight - 150) + "px",
+      nodes: {
+        shape: "box",
+        margin: {
+          top: 10,
+          right: 10,
+          bottom: 10,
+          left: 10
+        },
+        widthConstraint: {
+          maximum: 200
         }
-      })
-    }
-
+      },
+      edges: {
+        width: 2,
+        arrows: 'from',
+        smooth: true,
+        color: {
+          color:'#848484',
+          highlight:'#848484',
+          hover: '#848484',
+          inherit: 'from',
+          opacity:1.0
+        }
+      },
+      layout: {
+        hierarchical: {
+            direction: 'UD',
+            nodeSpacing: 250,
+            //parentCentralization: false
+        }
+      },
+      interaction: {
+        dragNodes: false,
+        //dragView: false,
+        multiselect: false,
+        zoomView: false,
+        selectConnectedEdges: false
+      },
+      physics:{
+        enabled: true
+      }
+    };
   }
 
   seleccionarTareaPadre(): void{
-    if(this.network.getSelectedNodes().length!=0){
-      this.tarea.tareaPadre = this.tareasPadre.find(tareaPadre => tareaPadre.id == this.network.getSelectedNodes()[0])
-      this.cargarRamaTareas();
+    var nodes = this.networkTareaPadre.getSelectedNodes()
+    if(nodes.length!=0){
+      this.tarea.tareaPadre = this.tareas.find(tareaPadre => tareaPadre.id == nodes[0])
+      if(this.data.nodes.getIds().includes(this.tarea.id)){
+        //this.data.nodes.get().find(node => node.id == this.tarea.id).tareaPadre.id = nodes[0]
+        console.log(this.data.nodes.get())
+      } else{
+        console.log("es un cluster")
+      }
+      this.crearNetworkTareaPadre()
     }
   }
 
-  crearNetwork(): void{
-    this.isNetwork = true;
-    var container = document.getElementById('mynetwork');
-    this.network = new Network(container, this.data, this.options);
+  crearNetworkTareaPadre(): void{
+    this.openNetworkTareaPadre = true;
+    var container = document.getElementById('networkTareaPadre');
+    this.networkTareaPadre = new Network(container, this.data, this.options);
+    this.networkTareaPadre.on('doubleClick', (params) => {
+      if (params.nodes.length == 1) {
+        if (this.networkTareaPadre.isCluster(params.nodes[0]) == true) {
+          this.networkTareaPadre.openCluster(params.nodes[0]);
+          this.networkTareaPadre.stopSimulation();
+          this.networkTareaPadre.redraw();
+        }
+      }
+    })
+
+    for(var i=this.clusterOptionsByData.length-1; i>=0; i--){
+      this.networkTareaPadre.cluster(this.clusterOptionsByData[i])
+    }
   }
 
-  destroyNetwork(){
-    this.isNetwork = false;
-    this.network.destroy();
+  crearNetworkTareasPrecedentes(): void{
+    this.openNetworkTareasPrecedentes = true;
+    var container = document.getElementById('networkTareasPrecedentes');
+    this.networkTareasPrecedentes = new Network(container, this.data, this.options);
+    this.networkTareasPrecedentes.on('doubleClick', (params) => {
+      if (params.nodes.length == 1) {
+        if (this.networkTareasPrecedentes.isCluster(params.nodes[0]) == true) {
+          this.networkTareasPrecedentes.openCluster(params.nodes[0]);
+          this.networkTareasPrecedentes.stopSimulation();
+          this.networkTareasPrecedentes.redraw();
+        } else{
+          var nodes = this.networkTareasPrecedentes.getSelectedNodes()
+          if(nodes.length!=0){
+            this.tarea.tareasPrecedentes.push(this.tareas.find(tareaPrecedente => tareaPrecedente.id == nodes[0]))
+            this.completarTareasPrecedentes()
+            var tareasPrecedentes = this.tareas.filter(tarea => this.tarea.tareasPrecedentes.includes(tarea))
+            this.tarea.tareasPrecedentes = tareasPrecedentes
+            if(this.data.nodes.getIds().includes(this.tarea.id)){
+              //this.data.nodes.get().find(node => node.id == this.tarea.id).tareaPadre.id = nodes[0]
+            } else{
+              console.log("es un cluster")
+            }
+            this.crearNetworkTareasPrecedentes()
+          }
+        }
+      }
+    })
+
+    for(var i=this.clusterOptionsByData.length-1; i>=0; i--){
+      this.networkTareasPrecedentes.cluster(this.clusterOptionsByData[i])
+    }
   }
 
-  onTareaSelect(tarea: Tarea){
-    this.actualizarTareasPrecedentes();
+  destroyNetworkTareaPadre(){
+    this.openNetworkTareaPadre = false;
+    this.networkTareaPadre.destroy();
   }
-  onItemDeSelect(tarea: any){
-    this.actualizarTareasPrecedentes();
+
+  destroyNetworkTareasPrecedentes(){
+    this.openNetworkTareasPrecedentes = false;
+    this.networkTareasPrecedentes.destroy();
   }
 
   vaciarTareaPadre(){
     this.tarea.tareaPadre = new Tarea();
     this.tarea.tareasPrecedentes = [];
-    this.cargarRamaTareas();
-  }
-
-  cargarRamaTareas(){
-    if(this.tarea.tareaPadre.id!=null){
-      this.tareaService.getSubTareas(this.tarea.tareaPadre.id).subscribe(tareas => {this.ramaTareas = tareas, this.actualizarTareasPrecedentes()});
-    } else{
-      this.ramaTareas = this.tareasPadre;
-      this.actualizarTareasPrecedentes();
-    }
-  }
-
-  actualizarTareasPrecedentes(): void{
-    this.completarTareasPrecedentes();
-    this.idsExclusion=[]
-    this.tarea.tareasPrecedentes.forEach( tareaPrecedente => {
-      this.obtenerIdsExclusion(tareaPrecedente);
-    })
-    this.tareasPrecedentes = this.ramaTareas.filter(tarea=>!this.idsExclusion.includes(tarea.id) && tarea.id!=this.tarea.id);
-
-    let tareasExclusion: Tarea[] = [];
-    this.tarea.tareasPrecedentes.forEach( tareaPrecedente => {
-      if(this.idsExclusion.includes(tareaPrecedente.id)){
-        tareasExclusion.push(tareaPrecedente)
-      }
-    })
-    tareasExclusion.forEach(tarea => {
-      this.tarea.tareasPrecedentes.splice(this.tarea.tareasPrecedentes.indexOf(tarea), 1);
-    })
-  }
-
-  obtenerIdsExclusion(tarea:Tarea): void{
-    tarea.tareasPrecedentes.forEach(tareaPrecedente => {
-      if(tareaPrecedente.tareasPrecedentes.length!=0){
-        this.obtenerIdsExclusion(tareaPrecedente)
-      }
-      this.idsExclusion.push(tareaPrecedente.id);
-    })
   }
 
   completarJsonTarea(): void{
     if(this.tarea.tareaPadre.id==null){
       this.tarea.tareaPadre=null;
     }else{
-      this.tarea.tareaPadre = this.tareasPadre.find(tareaPadre => tareaPadre.id == this.tarea.tareaPadre.id);
+      this.tarea.tareaPadre = this.tareas.find(tareaPadre => tareaPadre.id == this.tarea.tareaPadre.id);
     }
     this.completarTareasPrecedentes();
   }
@@ -219,14 +256,15 @@ export class TareasFormComponent implements OnInit {
   completarTareasPrecedentes(): void{
     let ids : Array<Number> = [];
     this.tarea.tareasPrecedentes.forEach(tareaPrecedente => ids.push(tareaPrecedente.id));
-    this.tarea.tareasPrecedentes = this.ramaTareas.filter(tarea => ids.includes(tarea.id));
+    this.tarea.tareasPrecedentes = this.tareas.filter(tarea => ids.includes(tarea.id));
   }
 
   cargarTarea(): void{
     this.tarea.tareaPadre = new Tarea();
     this.sectorService.getSectores().subscribe(sectores => this.sectores = sectores);
-    this.tareaService.getTareasPadre().subscribe(tareas => {
-      this.tareasPadre = tareas;
+    this.tareaService.getTareas().subscribe(tareas => {
+      this.tareas = tareas;
+      this.tareasPadre = this.tareas.filter(tarea => tarea.tareaPadre==null)
       this.cargarAjustesNetwork();
 
       this.activatedRoute.params.subscribe(params => {
@@ -238,11 +276,7 @@ export class TareasFormComponent implements OnInit {
               this.tarea.tareaPadre=new Tarea();
               this.tarea.tareaPadre.id = null;
             }
-            //this.tareasPadre = this.tareasPadre.filter(tareaPadre => tareaPadre.id != this.tarea.id)
-            this.cargarRamaTareas();
           })
-        } else{
-          this.cargarRamaTareas();
         }
 
       })

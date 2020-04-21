@@ -28,7 +28,8 @@
               "src/styles.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/sweetalert2/dist/sweetalert2.min.css",
-              "node_modules/vis/dist/vis.css"
+              "node_modules/vis/dist/vis.css",
+              "node_modules/ng-zorro-antd/ng-zorro-antd.css"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.slim.min.js",

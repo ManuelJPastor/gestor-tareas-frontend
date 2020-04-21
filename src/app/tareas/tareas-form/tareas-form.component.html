@@ -12,7 +12,7 @@
 
     <form #tareaForm="ngForm">
       <div class="form-group row">
-        <label for="titulo" class="col-form-label col-sm-2">Título</label>
+        <label for="titulo" class="col-form-label col-sm-3">Título</label>
         <div class="col-sm-8">
           <input type="text" class="form-control text-dark" [(ngModel)]="tarea.titulo" [placeholder]="'Introduzca el título'" name="titulo" required maxlength="50" #titulo="ngModel">
           <div class="alert alert-danger" *ngIf="titulo.invalid && (titulo.dirty || titulo.touched)">
@@ -27,14 +27,14 @@
       </div>
 
       <div class="form-group row">
-        <label for="descripcion" class="col-form-label col-sm-2">Descripción</label>
+        <label for="descripcion" class="col-form-label col-sm-3">Descripción</label>
         <div class="col-sm-8">
           <textarea type="text" class="form-control text-dark" [(ngModel)]="tarea.descripcion" [placeholder]="'Introduzca la descripción'" name="descripcion" rows="2"></textarea>
         </div>
       </div>
 
       <div class="form-group row">
-        <label for="fechaMax" class="col-form-label col-sm-2">Fecha Máxima</label>
+        <label for="fechaMax" class="col-form-label col-sm-3">Fecha Máxima</label>
         <div class="col-sm-8">
           <input type="date" class="form-control text-dark" [(ngModel)]="tarea.fechaMax" name="fechaMax" required #fechaMax="ngModel">
           <div class="alert alert-danger" *ngIf="fechaMax.invalid && (fechaMax.dirty || fechaMax.touched)">
@@ -46,14 +46,14 @@
       </div>
 
       <div class="form-group row">
-        <label for="espacio" class="col-form-label col-sm-2">Espacio</label>
+        <label for="espacio" class="col-form-label col-sm-3">Espacio</label>
         <div class="col-sm-8">
           <input type="text" class="form-control text-dark" [(ngModel)]="tarea.espacio" [placeholder]="'Introduzca el espacio'" name="espacio">
         </div>
       </div>
 
       <div class="form-group row">
-        <label for="sector" class="col-form-label col-sm-2">Departamento</label>
+        <label for="sector" class="col-form-label col-sm-3">Departamento</label>
         <div class="col-sm-8">
           <select class="form-control text-dark" [(ngModel)]="tarea.sector.id" name="sector" required #sector="ngModel">
             <option *ngFor="let sector of sectores" [value]="sector.id">{{sector.sector}}</option>
@@ -62,51 +62,47 @@
       </div>
 
       <div class="form-group row">
-        <label for="tareaPadre" class="col-form-label col-sm-2">Tarea padre</label>
-        <div class="col-sm-6">
-          <input type="text" class="form-control text-dark" [(ngModel)]="tarea.tareaPadre.titulo" disabled="true" [placeholder]="'No tiene tarea padre'" name="tareaPadre">
+        <label for="tareaPadre" class="col-form-label col-sm-3">Tarea padre</label>
+        <div class="col-sm-8">
+          <nz-tree-select
+            style="width: 100%"
+            nzPlaceHolder="Selecciona la tarea padre"
+            [(ngModel)]="tareaPadreId"
+            [nzNodes]="nodesTareas"
+            [nzDefaultExpandAll]="false"
+            [nzAllowClear]="false"
+            [nzAsyncData]="true"
+            (nzExpandChange)="onExpandChange($event, 'tareaPadre')"
+            (ngModelChange)="selectTareaPadre($event)"
+            class="form-control"
+            name="tareaPadre"
+            id="tareaPadre">
+          </nz-tree-select>
         </div>
-        <div class="col-sm-2 d-flex">
-          <button class="btn btn-sm btn-success btn-network ml-auto" role="button" (click)='crearNetworkTareaPadre()' *ngIf="!openNetworkTareaPadre else elseButton">Elegir</button>
-          <ng-template #elseButton>
-            <button class="btn btn-sm btn-secondary btn-network ml-auto" role="button" (click)='destroyNetworkTareaPadre()'>Ocultar</button>
-          </ng-template>
-        </div>
-        <div class="col-sm-8 offset-sm-2 bg-white mt-2 border border-primary py-1 d-flex rounded-top" *ngIf="openNetworkTareaPadre">
-          <button class="btn btn-sm btn-primary ml-2" role="button" (click)='seleccionarTareaPadre()'>Seleccionar</button>
-          <button class="btn btn-sm btn-primary ml-auto" role="button" (click)='vaciarTareaPadre()'>Vaciar</button>
-        </div>
-        <div id="networkTareaPadre" class="col-sm-8 offset-sm-2 bg-white text-dark border border-dark border-top-0 rounded-bottom"></div>
-
-
-        <!--<div class="col-sm-8">
-          <select class="form-control text-dark" [(ngModel)]="tarea.tareaPadre.id" (change)="cargarRamaTareas()" name="tareaPadre">
-            <option *ngFor="let tareaPadre of tareasPadre" [value]="tareaPadre.id">{{tareaPadre.titulo}}</option>
-          </select>
-        </div>
-        <div class="col-sm-2">
-          <button class="btn btn-primary" role="button" (click)='vaciarTareaPadre()'>Vaciar</button>
-        </div>-->
       </div>
 
       <div class="form-group row">
-        <label for="tareasPrecedentes" class="col-form-label col-sm-2">Tareas Precedentes</label>
-        <div class="col-sm-6">
-          <ng-multiselect-dropdown class="text-dark"
-          [placeholder]="'Seleccione las tareas precedentes'"
-          name="tareasPrecedentes"
-          [(ngModel)]="tarea.tareasPrecedentes"
-          [data]="tarea.tareasPrecedentes"
-          [settings]="selectTareasPrecedentes">
-          </ng-multiselect-dropdown>
+        <label for="tareasPrecedentes" class="col-form-label col-sm-3">Tareas Precedentes</label>
+        <div class="col-sm-8">
+          <nz-tree-select
+            style="width: 100%"
+            nzPlaceHolder="Selecciona las tareas precedentes"
+            [(ngModel)]="tareasPrecedentes"
+            [nzMaxTagCount]="4"
+            [nzMaxTagPlaceholder]="omittedPlaceHolder"
+            [nzNodes]="nodesTareas"
+            [nzDefaultExpandAll]="false"
+            [nzAllowClear]="false"
+            [nzAsyncData]="true"
+            (nzExpandChange)="onExpandChange($event, 'tareasPrecedentes')"
+            nzCheckable
+            class="form-control"
+            name="tareasPrecedentes"
+            id="tareasPrecedentes">
+          </nz-tree-select>
+          <ng-template #omittedPlaceHolder let-omittedValues> y {{ omittedValues.length }} más... </ng-template>
         </div>
-        <div class="col-sm-2 d-flex">
-          <button class="btn btn-sm btn-success btn-network ml-auto" role="button" (click)='crearNetworkTareasPrecedentes()' *ngIf="!openNetworkTareasPrecedentes else elseButtonPrecedentes">Elegir</button>
-          <ng-template #elseButtonPrecedentes>
-            <button class="btn btn-sm btn-secondary btn-network ml-auto" role="button" (click)='destroyNetworkTareasPrecedentes()'>Ocultar</button>
-          </ng-template>
-        </div>
-        <div id="networkTareasPrecedentes" class="col-sm-8 offset-sm-2 bg-white text-dark border border-dark border-top-0 rounded-bottom"></div>
+
       </div>
 
       <div class="form-group row">

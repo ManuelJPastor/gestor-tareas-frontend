@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { Tarea } from './tarea';
 import Swal from 'sweetalert2';
-import { catchError } from 'rxjs/operators';
+import { catchError, filter, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -20,13 +20,7 @@ export class TareaService {
   }
 
   getTarea(id): Observable<Tarea>{
-    return this.http.get<Tarea>(`${this.urlEndPoint}/${id}`).pipe(
-      catchError(e => {
-        this.router.navigate(['/tareas']);
-        Swal.fire('Error al editar', e.error.mensaje, 'error');
-        return throwError(e);
-      })
-    );
+    return this.http.get<Tarea>(`${this.urlEndPoint}/${id}`);
   }
 
   getTareas(): Observable<Tarea[]> {

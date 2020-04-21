@@ -1,12 +1,14 @@
-ng-multiselect-dropdown .dropdown-list {
-   position: relative!important;
-   margin-top: 0px!important;
+.ant-select-selection-placeholder {
+  color: #6c757d;
+  opacity: 1;
+  font-weight: 480;
+  font-size: 16px;
 }
 
-ng-multiselect-dropdown .dropdown-btn{
-  background-color: white;
+.ant-select-multiple .ant-select-selector, .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+  border: 0px;
 }
 
-.btn-network{
-  height: 40px;
+#tareasPrecedentes, #tareaPadre{
+  height: 38px;
 }

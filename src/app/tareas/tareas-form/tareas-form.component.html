@@ -10,7 +10,7 @@
   </ng-template>
   <div class="card-body">
 
-    <form #tareaForm="ngForm">
+    <form #tareaForm="ngForm" novalidate>
       <div class="form-group row">
         <label for="titulo" class="col-form-label col-sm-3">Título</label>
         <div class="col-sm-8">
@@ -64,43 +64,30 @@
       <div class="form-group row">
         <label for="tareaPadre" class="col-form-label col-sm-3">Tarea padre</label>
         <div class="col-sm-8">
-          <nz-tree-select
-            style="width: 100%"
-            nzPlaceHolder="Selecciona la tarea padre"
-            [(ngModel)]="tareaPadreId"
-            [nzNodes]="nodesTareas"
-            [nzDefaultExpandAll]="false"
-            [nzAllowClear]="false"
-            [nzAsyncData]="true"
-            (nzExpandChange)="onExpandChange($event, 'tareaPadre')"
-            (ngModelChange)="selectTareaPadre($event)"
-            class="form-control"
-            name="tareaPadre"
-            id="tareaPadre">
-          </nz-tree-select>
+          <tree-select id="simpleSelect"
+              name="simpleSelect"
+              [items]="tareasPadre"
+              [multiple]="false"
+              [(ngModel)]="tarea.tareaPadre"
+              filterPlaceholder="Búsqueda por título"
+              [allowParentSelection]="true"
+              [allowFilter]="true">
+          </tree-select>
         </div>
       </div>
 
       <div class="form-group row">
         <label for="tareasPrecedentes" class="col-form-label col-sm-3">Tareas Precedentes</label>
         <div class="col-sm-8">
-          <nz-tree-select
-            style="width: 100%"
-            nzPlaceHolder="Selecciona las tareas precedentes"
-            [(ngModel)]="tareasPrecedentes"
-            [nzMaxTagCount]="4"
-            [nzMaxTagPlaceholder]="omittedPlaceHolder"
-            [nzNodes]="nodesTareas"
-            [nzDefaultExpandAll]="false"
-            [nzAllowClear]="false"
-            [nzAsyncData]="true"
-            (nzExpandChange)="onExpandChange($event, 'tareasPrecedentes')"
-            nzCheckable
-            class="form-control"
-            name="tareasPrecedentes"
-            id="tareasPrecedentes">
-          </nz-tree-select>
-          <ng-template #omittedPlaceHolder let-omittedValues> y {{ omittedValues.length }} más... </ng-template>
+          <tree-select id="multipleSelect"
+              name="multipleSelect"
+              [items]="tareasPadre"
+              [multiple]="true"
+              [(ngModel)]="tarea.tareasPrecedentes"
+              filterPlaceholder="Búsqueda por título"
+              [allowParentSelection]="true"
+              [allowFilter]="true">
+          </tree-select>
         </div>
 
       </div>

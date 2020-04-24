@@ -6,7 +6,6 @@ import Swal from 'sweetalert2';
 import { SectorService } from 'src/app/settings/sectores/sector.service';
 import { Sector } from 'src/app/settings/sectores/sector';
 import * as $ from 'jquery';
-import { NzFormatEmitEvent, NzTreeNodeOptions, NzTreeNode} from 'ng-zorro-antd/tree/public-api';
 
 @Component({
   selector: 'app-tareas-form',
@@ -24,10 +23,6 @@ export class TareasFormComponent implements OnInit {
   private tarea: Tarea = new Tarea();
   private sectores: Sector[];
 
-  private nodesTareas: NzTreeNodeOptions[] = [];
-  private tareaPadreId: string;
-  private tareasPrecedentesIds: string[];
-
 
   constructor(private tareaService: TareaService, private sectorService: SectorService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
@@ -40,24 +35,20 @@ export class TareasFormComponent implements OnInit {
     this.tarea.tareaPadre = new Tarea();
     this.sectorService.getSectores().subscribe(sectores => this.sectores = sectores);
     this.tareaService.getTareasPadre().subscribe(tareasPadre => {
-      this.tareasPadre = tareasPadre;
-      this.tareasPadre.forEach(tarea => {
-        var node = {key: tarea.id.toString(), title: tarea.titulo, isLeaf: false};
-        this.tareaService.getSubTareas(tarea.id).subscribe(subTareas => {
-          if(subTareas.length==0){
-            node.isLeaf = true;
-          }
-          this.nodesTareas.push(node);
-        })
 
+      tareasPadre.forEach(tareaPadre => {
+        this.recorrerSubtareas(tareaPadre)
       })
+
+      setTimeout( () => {
+        this.tareasPadre = tareasPadre
+      }, 1500 );
 
       this.activatedRoute.params.subscribe(params => {
         let id = params['id']
         if(id){
           this.tareaService.getTarea(id).subscribe( tarea => {
             this.tarea = tarea;
-            this.tareaPadreId = this.tarea.tareaPadre.id.toString()
             if(this.tarea.tareaPadre==null){
               this.tarea.tareaPadre=new Tarea();
               this.tarea.tareaPadre.id = null;
@@ -66,6 +57,17 @@ export class TareasFormComponent implements OnInit {
         }
       })
     });
+
+  }
+
+  recorrerSubtareas(tarea: Tarea){
+    tarea.subTareas = new Array<Tarea>()
+    this.tareaService.getSubTareas(tarea.id).subscribe(subTareas => {
+      subTareas.forEach(subTarea => {
+        this.recorrerSubtareas(subTarea)
+        tarea.subTareas.push(subTarea)
+      })
+    })
   }
 
   selectTareaPadre(id: number): void {
@@ -76,7 +78,7 @@ export class TareasFormComponent implements OnInit {
     }
   }
 
-  onExpandChange(e: NzFormatEmitEvent, id: string): void {
+  /*onExpandChange(e: NzFormatEmitEvent, id: string): void {
     const node = e.node;
     if(node.getChildren().length==0){
       this.tareaService.getSubTareas(node.key).subscribe(subTareas => {
@@ -96,7 +98,7 @@ export class TareasFormComponent implements OnInit {
         }
       })
     }
-  }
+  }*/
 
   completarJsonTarea(): void{
     if(this.tarea.tareaPadre.id==null){
@@ -131,7 +133,9 @@ export class TareasFormComponent implements OnInit {
   }
 
   update(): void{
+    console.log(this.tarea)
     this.completarJsonTarea()
+    console.log(this.tarea)
     this.tareaService.update(this.tarea).subscribe(response => {
       this.router.navigate(['tareas'])
       Swal.fire('Tarea Actualizada',`${response.mensaje}: ${response.tarea.titulo}`, 'success')

@@ -25,7 +25,7 @@ import { SectoresComponent } from './settings/sectores/sectores.component';
 import { SectoresFormComponent } from './settings/sectores/sectores-form/sectores-form.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { TareasRamaComponent } from './tareas/tareas-rama/tareas-rama.component';
-import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
+import { ExpandMode, NgxTreeSelectModule } from 'ngx-tree-select';
 
 const routes: Routes = [
   {path: '', redirectTo: '/usuarios', pathMatch: 'full'},
@@ -60,7 +60,7 @@ const routes: Routes = [
     SettingsComponent,
     SectoresComponent,
     SectoresFormComponent,
-    TareasRamaComponent
+    TareasRamaComponent,
   ],
   imports: [
     BrowserModule,
@@ -70,8 +70,16 @@ const routes: Routes = [
     BrowserAnimationsModule,
     MatPaginatorModule,
     NgMultiSelectDropDownModule.forRoot(),
-    NzTreeSelectModule
-
+    NgxTreeSelectModule.forRoot({
+       idField: 'id',
+       textField: 'titulo',
+       expandMode: ExpandMode.None,
+       allowFilter: true,
+       filterPlaceholder: 'Type your filter here...',
+       maxVisibleItemCount: 5,
+       childrenField: 'subTareas',
+       allowParentSelection: true,
+     })
   ],
     providers: [UsuarioService, AuthenticationService, {provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl} /*{
       provide: HTTP_INTERCEPTORS,

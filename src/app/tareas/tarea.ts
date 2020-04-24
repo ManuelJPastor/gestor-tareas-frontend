@@ -11,7 +11,8 @@ export class Tarea {
   nivel: number;
   estado: String;
   sector: Sector = new Sector();
-  tareaPadre: Tarea;
+  tareaPadre: Tarea
+  subTareas: Array<Tarea> = new Array<Tarea>()
   tareasPrecedentes: Array<Tarea> = new Array<Tarea>();
   usuarios: Usuario[] = new Array<Usuario>();
 }

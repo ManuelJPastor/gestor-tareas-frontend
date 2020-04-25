@@ -16,6 +16,8 @@ private nodes;
 private edges;
 private network: Network;
 
+private tarea: Tarea;
+
 private clusterOptionsByData = [];
 
 private ramaTareas: Tarea[];
@@ -27,6 +29,10 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
     this.activatedRoute.params.subscribe(params => {
       let id = params['id']
       if(id){
+        this.tareaService.getTarea(id).subscribe(tarea => {
+          this.tarea = tarea
+        })
+
         this.tareaService.getRamaTareas(id).subscribe(tareas => {
           this.ramaTareas = tareas;
 
@@ -160,31 +166,61 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
           this.crearSubtareas(subTarea)
         });
 
-        this.clusterOptionsByData.push({
-          joinCondition: function(childOptions) {
-            if(childOptions.tareaPadre!=null){
-              return childOptions.tareaPadre.id == tarea.id;
-            } else{
-              return false;
-            }
+        if(tarea.id == this.tarea.id){
+          this.clusterOptionsByData.push({
+            joinCondition: function(childOptions) {
+              if(childOptions.tareaPadre!=null){
+                return childOptions.tareaPadre.id == tarea.id;
+              } else{
+                return false;
+              }
 
-          },
-          clusterNodeProperties: {
-            id: tarea.id,
-            borderWidth: 3,
-            shape: "box",
-            color: {
-              border: "blue"
             },
-            allowSingleNodeCluster: true,
-            label: tarea.titulo,
-            level: tarea.nivel,
-            tareaPadre: tarea.tareaPadre
-          }
-        })
+            clusterNodeProperties: {
+              id: tarea.id,
+              borderWidth: 3,
+              shape: "box",
+              color: {border: '#FE0303',  background: '#FF4444',
+                      highlight: { border: '#FE0303', background: '#FF4444'}},
+              allowSingleNodeCluster: true,
+              label: tarea.titulo,
+              level: tarea.nivel,
+              tareaPadre: tarea.tareaPadre
+            }
+          })
+        } else{
+          this.clusterOptionsByData.push({
+            joinCondition: function(childOptions) {
+              if(childOptions.tareaPadre!=null){
+                return childOptions.tareaPadre.id == tarea.id;
+              } else{
+                return false;
+              }
 
+            },
+            clusterNodeProperties: {
+              id: tarea.id,
+              borderWidth: 3,
+              shape: "box",
+              color: {
+                border: "blue"
+              },
+              allowSingleNodeCluster: true,
+              label: tarea.titulo,
+              level: tarea.nivel,
+              tareaPadre: tarea.tareaPadre
+            }
+          })
+        }
       }else{
-        node = {id: tarea.id, label: tarea.titulo, level: (tarea.tareaPadre.nivel + tarea.nivel) - 1, tareaPadre: tarea.tareaPadre};
+        if(tarea.id == this.tarea.id){
+          node = {id: tarea.id, label: tarea.titulo, level: (tarea.tareaPadre.nivel + tarea.nivel) - 1, tareaPadre: tarea.tareaPadre,
+                      color: {border: '#FE0303',  background: '#FF4444',
+                              highlight: { border: '#FE0303', background: '#FF4444'}}};
+        } else{
+          node = {id: tarea.id, label: tarea.titulo, level: (tarea.tareaPadre.nivel + tarea.nivel) - 1, tareaPadre: tarea.tareaPadre};
+        }
+
         this.nodes.add(node);
         tarea.tareasPrecedentes.forEach(tareaPrecedente => {
           var edge = {from: tarea.id, to: tareaPrecedente.id};

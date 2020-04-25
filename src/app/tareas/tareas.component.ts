@@ -13,7 +13,7 @@ export class TareasComponent implements OnInit {
 
   mostrarTodas: boolean = false;
 
-  tareas: Tarea[];
+  tareas: Tarea[] = new Array<Tarea>();
 
   page_number: number = 1;
   page_size: number = 10;

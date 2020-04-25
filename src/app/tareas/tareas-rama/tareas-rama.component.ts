@@ -40,21 +40,21 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
           this.edges = new DataSet<any>();
 
           tareas.forEach(tarea => {
-            this.crearSubtareas(tarea)
-            /*
+            var node
             if(tarea.id == id){
+
               node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel,
                           color: {border: '#FE0303',  background: '#FF4444',
                                   highlight: { border: '#FE0303', background: '#FF4444'}}};
             } else{
               node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel};
             }
-            nodes.add(node);
+            this.nodes.add(node);
 
             tarea.tareasPrecedentes.forEach(tareaPrecedente => {
               var edge = {from: tarea.id, to: tareaPrecedente.id};
-              edges.add(edge);
-            })*/
+              this.edges.add(edge);
+            })
 
           })
 

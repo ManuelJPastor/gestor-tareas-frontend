@@ -12,7 +12,7 @@ import { PageEvent } from '@angular/material/paginator';
 })
 export class UsuariosComponent implements OnInit {
 
-  usuarios: Usuario[];
+  usuarios: Usuario[] = new Array<Usuario>();;
 
   page_number: number = 1;
   page_size: number = 10;

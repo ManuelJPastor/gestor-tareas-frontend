@@ -40,7 +40,9 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
           this.edges = new DataSet<any>();
 
           tareas.forEach(tarea => {
-            var node
+            this.crearSubtareas(tarea)
+
+            /*var node
             if(tarea.id == id){
 
               node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel,
@@ -54,7 +56,7 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
             tarea.tareasPrecedentes.forEach(tareaPrecedente => {
               var edge = {from: tarea.id, to: tareaPrecedente.id};
               this.edges.add(edge);
-            })
+            })*/
 
           })
 

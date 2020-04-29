@@ -64,8 +64,8 @@
       <div class="form-group row">
         <label for="tareaPadre" class="col-form-label col-sm-3">Tarea padre</label>
         <div class="col-sm-8">
-          <tree-select id="simpleSelect"
-              name="simpleSelect"
+          <tree-select id="tareaPadre"
+              name="tareaPadre"
               [items]="tareasPadre"
               [multiple]="false"
               [(ngModel)]="tarea.tareaPadre"
@@ -79,8 +79,8 @@
       <div class="form-group row">
         <label for="tareasPrecedentes" class="col-form-label col-sm-3">Tareas Precedentes</label>
         <div class="col-sm-8">
-          <tree-select id="multipleSelect"
-              name="multipleSelect"
+          <tree-select id="tareasPrecedentes"
+              name="tareasPrecedentes"
               [items]="tareasPadre"
               [multiple]="true"
               [(ngModel)]="tarea.tareasPrecedentes"
@@ -89,7 +89,20 @@
               [allowFilter]="true">
           </tree-select>
         </div>
+      </div>
 
+      <div class="form-group row">
+        <label for="usuarios" class="col-form-label col-sm-3">Usuarios</label>
+        <div class="col-sm-8">
+          <ng-multiselect-dropdown
+            name = "usuarios"
+            [placeholder]="'Seleccione los usuarios'"
+            [data]="usuariosSector"
+            [(ngModel)]="tarea.usuarios"
+            [settings]="usuariosSettings"
+          >
+          </ng-multiselect-dropdown>
+        </div>
       </div>
 
       <div class="form-group row">

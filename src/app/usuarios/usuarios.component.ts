@@ -12,7 +12,7 @@ import { PageEvent } from '@angular/material/paginator';
 })
 export class UsuariosComponent implements OnInit {
 
-  usuarios: Usuario[] = new Array<Usuario>();;
+  usuarios: Usuario[] = new Array<Usuario>();
 
   page_number: number = 1;
   page_size: number = 10;
@@ -42,7 +42,7 @@ export class UsuariosComponent implements OnInit {
   delete(usuario: Usuario): void {
     Swal.fire({
       title: '¿Estas seguro?',
-      text: `¿Desea eliminar el usuario ${usuario.nombre} ${usuario.apellido}?`,
+      text: `¿Desea eliminar el usuario ${usuario.nombre}?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',

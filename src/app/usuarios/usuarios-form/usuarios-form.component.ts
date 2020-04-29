@@ -23,11 +23,6 @@ export class UsuariosFormComponent implements OnInit {
 
   ngOnInit() {
     this.cargarCliente()
-
-    this.usuarioService.getSectores().subscribe(
-      sectores => this.sectores = sectores
-
-    );
   }
 
   cargarCliente(): void{

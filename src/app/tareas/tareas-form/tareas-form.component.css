@@ -16,3 +16,33 @@ tree-select .selected-item-item{
 tree-select .selected-item-text{
   color: #343a40;
 }
+
+ng-multiselect-dropdown .dropdown-list {
+   position: relative!important;
+   margin-top: 0px!important;
+}
+
+ng-multiselect-dropdown .dropdown-btn{
+  background-color: white;
+}
+
+ng-multiselect-dropdown .dropdown-btn span{
+  color: gray;
+}
+
+ng-multiselect-dropdown .dropdown-btn .selected-item{
+  border: 1px solid gray!important;
+  border-radius: .25rem!important;
+  background-color: white!important;
+  color: black!important;
+  padding-left: 12px!important;
+  padding-top: 6px!important;
+  padding-bottom: 6px!important;
+  font-size: 14px!important;
+}
+
+ng-multiselect-dropdown .dropdown-btn a{
+  color: gray!important;
+  font-size: 18px!important;
+  line-height: .75!important;
+}

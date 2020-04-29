@@ -80,7 +80,7 @@ export class UsuarioService {
     );
   }
 
-  getSectores(): Observable<string[]>{
-    return this.http.get<string[]>(this.urlEndPoint+'/sectores', {headers: this.httpHeaders});
+  getUsuariosBySector(id): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(`${this.urlEndPoint}/sector/${id}`, {headers: this.httpHeaders});
   }
 }

@@ -6,6 +6,9 @@ import Swal from 'sweetalert2';
 import { SectorService } from 'src/app/settings/sectores/sector.service';
 import { Sector } from 'src/app/settings/sectores/sector';
 import * as $ from 'jquery';
+import { UsuarioService } from 'src/app/usuarios/usuario.service';
+import { Usuario } from 'src/app/usuarios/usuario';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
 
 @Component({
   selector: 'app-tareas-form',
@@ -19,21 +22,40 @@ export class TareasFormComponent implements OnInit {
   private tituloEditar:string = "Editar Tarea";
   private errores: string[];
 
-  private tareasPadre: Tarea[];
+  private tareasPadre: Tarea[] =  new Array<Tarea>();
   private tarea: Tarea = new Tarea();
   private sectores: Sector[];
+  private usuariosSector: Usuario[] =[];
+
+  private usuariosSettings: IDropdownSettings;
 
 
-  constructor(private tareaService: TareaService, private sectorService: SectorService, private router: Router, private activatedRoute: ActivatedRoute) { }
+  constructor(private tareaService: TareaService, private sectorService: SectorService, private usuarioService: UsuarioService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
 
   ngOnInit() {
     this.cargarTarea();
+    this.sectorService.getSectores().subscribe(sectores => {
+      this.sectores = sectores;
+    });
+
+
+    this.usuariosSettings = {
+      singleSelection: false,
+      idField: 'id',
+      textField: 'nombre',
+      selectAllText: 'Seleccionar todos',
+      unSelectAllText: 'Deseleccionar todos',
+      itemsShowLimit: 3,
+      allowSearchFilter: true,
+      searchPlaceholderText: 'Buscar por nombre',
+      noDataAvailablePlaceholderText: 'No existen usuarios en el departamento'
+    };
   }
 
   cargarTarea(): void{
     this.tarea.tareaPadre = new Tarea();
-    this.sectorService.getSectores().subscribe(sectores => this.sectores = sectores);
+
     this.tareaService.getTareasPadre().subscribe(tareasPadre => {
 
       tareasPadre.forEach(tareaPadre => {
@@ -48,6 +70,9 @@ export class TareasFormComponent implements OnInit {
         let id = params['id']
         if(id){
           this.tareaService.getTarea(id).subscribe( tarea => {
+            this.usuarioService.getUsuariosBySector(tarea.sector.id).subscribe(usuarios => {
+              this.usuariosSector = usuarios
+            })
             this.tarea = tarea;
             if(this.tarea.tareaPadre==null){
               this.tarea.tareaPadre=new Tarea();

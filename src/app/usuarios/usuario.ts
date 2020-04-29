@@ -1,10 +1,10 @@
 import { Role } from './role';
+import { Sector } from '../settings/sectores/sector';
 
 export class Usuario {
   id: number;
   nombre: string;
-  apellido: string;
   email: string;
-  sector: string;
+  sector: Sector;
   roles: Role[];
 }

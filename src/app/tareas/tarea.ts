@@ -12,7 +12,7 @@ export class Tarea {
   estado: String;
   sector: Sector = new Sector();
   tareaPadre: Tarea
-  subTareas: Array<Tarea> = new Array<Tarea>()
+  subTareas: Array<Tarea> = new Array<Tarea>();
   tareasPrecedentes: Array<Tarea> = new Array<Tarea>();
   usuarios: Usuario[] = new Array<Usuario>();
 }

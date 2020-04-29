@@ -22,7 +22,6 @@
           <tr>
             <th class="text-center">Id</th>
             <th class="text-center">Nombre</th>
-            <th class="text-center">Apellido</th>
             <th class="text-center">Email</th>
             <th class="text-center">Sector</th>
             <th class="text-center">Roles</th>
@@ -34,9 +33,8 @@
           <tr *ngFor="let usuario of usuarios | paginacion:page_size:page_number">
             <td class="text-center">{{usuario.id}}</td>
             <td class="text-center">{{usuario.nombre}}</td>
-            <td class="text-center">{{usuario.apellido}}</td>
             <td class="text-center">{{usuario.email}}</td>
-            <td class="text-center">{{usuario.sector}}</td>
+            <td class="text-center">{{usuario.sector.sector}}</td>
             <td class="text-center"><ng-container *ngFor="let role of usuario.roles; let lastcall=last">{{role.role}}<ng-container *ngIf="!lastcall">, </ng-container></ng-container></td>
             <td class="text-center">
               <button type="button" name="button" [routerLink]="['/usuarios/form', usuario.id]" class="btn btn-primary btn-sm">Editar</button>

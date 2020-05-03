@@ -22,6 +22,8 @@ private clusterOptionsByData = [];
 
 private ramaTareas: Tarea[];
 
+private isCluster:Boolean;
+
 constructor(private tareaService: TareaService, private activatedRoute: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
@@ -70,7 +72,7 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
             var options = {
               autoResize: true,
               width: '100%',
-              height: (window.innerHeight - 150) + "px",
+              height: (window.innerHeight - 200) + "px",
               nodes: {
                 shape: "box",
                 margin: {
@@ -130,12 +132,26 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
               this.network.on('selectNode', (params) => {
                 if (params.nodes.length == 1) {
                   if (this.network.isCluster(params.nodes[0]) == true) {
+                    this.isCluster = true;
+                  }
+                }
+              })
+
+              this.network.on('deselectNode', (params) => {
+                if (params.nodes.length == 0) {
+                  this.isCluster = false;
+                }
+              })
+
+              /*this.network.on('selectNode', (params) => {
+                if (params.nodes.length == 1) {
+                  if (this.network.isCluster(params.nodes[0]) == true) {
                     this.network.openCluster(params.nodes[0]);
                     this.network.stopSimulation()
                   }
                 }
                 this.network.redraw();
-              })
+              })*/
               for(var i=this.clusterOptionsByData.length-1; i>=0; i--){
                 this.network.cluster(this.clusterOptionsByData[i])
                 this.clusterOptionsByData.splice(i,1)

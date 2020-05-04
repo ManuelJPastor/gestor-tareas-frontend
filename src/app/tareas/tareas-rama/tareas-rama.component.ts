@@ -38,7 +38,6 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
             this.tareaPadre = this.tarea.tareaPadre
             this.crearRama(tareas)
           });
-
         })
       }
     })
@@ -126,7 +125,33 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
             selectConnectedEdges: false
           },
           manipulation: {
-            enabled:true
+            addNode: (data, callback) => {
+              // filling in the popup DOM elements
+              document.getElementById("node-operation").innerHTML = "Add Node";
+              this.editNode(data, this.clearNodePopUp, callback);
+            },
+            editNode: (data, callback) => {
+              // filling in the popup DOM elements
+              document.getElementById("node-operation").innerHTML = "Edit Node";
+              this.editNode(data, this.cancelNodeEdit, callback);
+            },
+            addEdge: (data, callback) => {
+              if (data.from == data.to) {
+                var r = confirm("Do you want to connect the node to itself?");
+                if (r != true) {
+                  callback(null);
+                  return;
+                }
+              }
+              document.getElementById("edge-operation").innerHTML = "Add Edge";
+              this.editEdgeWithoutDrag(data, callback);
+            },
+            editEdge: {
+              editWithoutDrag: (data, callback) => {
+                document.getElementById("edge-operation").innerHTML = "Edit Edge";
+                this.editEdgeWithoutDrag(data, callback);
+              }
+            }
           },
           physics:{
             enabled: true
@@ -178,7 +203,6 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
       this.tareaService.getSubTareas(this.network.getSelectedNodes()[0]).subscribe(subTareas => {
         this.tareaService.getTarea(this.network.getSelectedNodes()[0]).subscribe(tarea => {
           this.tareaPadre = tarea;
-          console.log(this.tareaPadre)
         })
         this.hasSubTareas=false
         this.crearRama(subTareas);
@@ -191,6 +215,72 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
       this.tareaPadre = this.tareaPadre.tareaPadre;
       this.crearRama(tareas);
     })
+  }
+
+  editNode(data, cancelAction, callback) {
+  document.getElementById("node-label").nodeValue = data.label;
+  document.getElementById("node-saveButton").onclick = this.saveNodeData.bind(
+    this,
+    data,
+    callback
+  );
+  document.getElementById("node-cancelButton").onclick = cancelAction.bind(
+    this,
+    callback
+  );
+  document.getElementById("node-popUp").style.display = "block";
+}
+
+// Callback passed as parameter is ignored
+  clearNodePopUp() {
+    document.getElementById("node-saveButton").onclick = null;
+    document.getElementById("node-cancelButton").onclick = null;
+    document.getElementById("node-popUp").style.display = "none";
+  }
+
+  cancelNodeEdit(callback) {
+    this.clearNodePopUp();
+    callback(null);
+  }
+
+  saveNodeData(data, callback) {
+    data.label = document.getElementById("node-label").nodeValue;
+    this.clearNodePopUp();
+    callback(data);
+  }
+
+  editEdgeWithoutDrag(data, callback) {
+    // filling in the popup DOM elements
+    document.getElementById("edge-label").nodeValue = data.label;
+    document.getElementById("edge-saveButton").onclick = this.saveEdgeData.bind(
+      this,
+      data,
+      callback
+    );
+    document.getElementById("edge-cancelButton").onclick = this.cancelEdgeEdit.bind(
+      this,
+      callback
+    );
+    document.getElementById("edge-popUp").style.display = "block";
+  }
+
+  clearEdgePopUp() {
+    document.getElementById("edge-saveButton").onclick = null;
+    document.getElementById("edge-cancelButton").onclick = null;
+    document.getElementById("edge-popUp").style.display = "none";
+  }
+
+  cancelEdgeEdit(callback) {
+    this.clearEdgePopUp();
+    callback(null);
+  }
+
+  saveEdgeData(data, callback) {
+    if (typeof data.to === "object") data.to = data.to.id;
+    if (typeof data.from === "object") data.from = data.from.id;
+    data.label = document.getElementById("edge-label").nodeValue;
+    this.clearEdgePopUp();
+    callback(data);
   }
 
 }

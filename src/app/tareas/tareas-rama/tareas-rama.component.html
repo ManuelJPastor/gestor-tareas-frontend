@@ -1,10 +1,24 @@
-<div class="row">
+<div class="row mb-2">
   <div class="col-3">
-    <button class="btn btn-primary" (click)="ramaTareaPadre()" *ngIf="tareaPadre!=null">{{tareaPadre.titulo}}</button>
+    <button class="btn btn-sm btn-primary" (click)="ramaTareaPadre()" *ngIf="tareaPadre!=null">{{tareaPadre.titulo}}</button>
   </div>
   <div class="offset-6 col-3 text-right">
-    <button class="btn btn-primary" (click)="abrirSubtareas()" [disabled]="!hasSubTareas">Abrir Rama SubTareas</button>
+    <button class="btn btn-sm btn-primary" (click)="abrirSubtareas()" [disabled]="!hasSubTareas">Abrir Rama SubTareas</button>
   </div>
+</div>
+
+<div id="node-popUp">
+  <span id="node-operation">node</span> <br />
+  <table >
+    <tbody>
+      <tr>
+        <td>titulo</td>
+        <td><input id="node-label" value="new value" /></td>
+      </tr>
+    </tbody>
+  </table>
+  <input type="button" value="save" id="node-saveButton" />
+  <input type="button" value="cancel" id="node-cancelButton" />
 </div>
 
 <div id="mynetwork" class="border rounded border-dark">

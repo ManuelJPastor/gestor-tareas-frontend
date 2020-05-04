@@ -1,4 +1,12 @@
-<button class="btn btn-primary" (click)="abrirSubtareas()" [disabled]="!hasSubTareas">Abrir Rama SubTareas</button>
+<div class="row">
+  <div class="col-3">
+    <button class="btn btn-primary" (click)="ramaTareaPadre()" *ngIf="tareaPadre!=null">{{tareaPadre.titulo}}</button>
+  </div>
+  <div class="offset-6 col-3 text-right">
+    <button class="btn btn-primary" (click)="abrirSubtareas()" [disabled]="!hasSubTareas">Abrir Rama SubTareas</button>
+  </div>
+</div>
+
 <div id="mynetwork" class="border rounded border-dark">
 
 </div>

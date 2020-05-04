@@ -17,6 +17,7 @@ private edges;
 private network: Network;
 
 private tarea: Tarea;
+private tareaPadre: Tarea = null;
 
 private clusterOptionsByData = [];
 
@@ -34,6 +35,7 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
         this.tareaService.getTarea(id).subscribe(tarea => {
           this.tarea = tarea
           this.tareaService.getRamaTareas(id).subscribe(tareas => {
+            this.tareaPadre = this.tarea.tareaPadre
             this.crearRama(tareas)
           });
 
@@ -49,7 +51,6 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
       this.edges = new DataSet<any>();
 
       tareas.forEach(tarea => {
-        //this.crearSubtareas(tarea)
 
         var node
         if(tarea.id == this.tarea.id){
@@ -172,15 +173,24 @@ constructor(private tareaService: TareaService, private activatedRoute: Activate
         }, 500 );
   }
 
-
   abrirSubtareas(): void{
     if(this.network.getSelectedNodes().length!=0){
       this.tareaService.getSubTareas(this.network.getSelectedNodes()[0]).subscribe(subTareas => {
-        this.crearRama(subTareas)
+        this.tareaService.getTarea(this.network.getSelectedNodes()[0]).subscribe(tarea => {
+          this.tareaPadre = tarea;
+          console.log(this.tareaPadre)
+        })
+        this.hasSubTareas=false
+        this.crearRama(subTareas);
       })
-
     }
+  }
 
+  ramaTareaPadre(): void{
+    this.tareaService.getRamaTareas(this.tareaPadre.id).subscribe(tareas => {
+      this.tareaPadre = this.tareaPadre.tareaPadre;
+      this.crearRama(tareas);
+    })
   }
 
 }

@@ -8,19 +8,49 @@
 </div>
 
 <div id="node-popUp">
-  <span id="node-operation">node</span> <br />
-  <table >
-    <tbody>
-      <tr>
-        <td>titulo</td>
-        <td><input id="node-label" value="new value" /></td>
-      </tr>
-    </tbody>
-  </table>
-  <input type="button" value="save" id="node-saveButton" />
-  <input type="button" value="cancel" id="node-cancelButton" />
+  <h3 id="node-operation" class="text-center">node</h3>
+  <form #tareaForm="ngForm" novalidate>
+    <table class="table card-table table-bordered table-striped text-dark">
+      <thead>
+        <tr>
+          <th class="text-center" style="width: 33%;">Titulo</th>
+          <th class="text-center" style="width: 33%;">FechaMax</th>
+          <th class="text-center" style="width: 33%;">Sector</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <input id="node-label" type="text" class="form-control text-dark" [(ngModel)]="editTarea.titulo" [placeholder]="'Introduzca el título'" name="titulo" required maxlength="50" #titulo="ngModel">
+            <div class="alert alert-danger" *ngIf="titulo.invalid && (titulo.dirty || titulo.touched)">
+              <div *ngIf="titulo.errors.required">
+                Titulo es requerido.
+              </div>
+              <div *ngIf="titulo.errors.maxlength">
+                Titulo debe tener como máximo 50 caracteres.
+              </div>
+            </div>
+          </td>
+          <td>
+            <input id="node-fechaMax" type="date" class="form-control text-dark" [(ngModel)]="editTarea.fechaMax" name="fechaMax" required #fechaMax="ngModel">
+            <div class="alert alert-danger" *ngIf="fechaMax.invalid && (fechaMax.dirty || fechaMax.touched)">
+              <div *ngIf="fechaMax.errors.required">
+                Fecha Máxima es requerida.
+              </div>
+            </div>
+          </td>
+          <td>
+            <select id="node-sector" class="form-control text-dark" [(ngModel)]="editTarea.sector.id" name="sector" required #sector="ngModel">
+              <option *ngFor="let sector of sectores" [value]="sector.id">{{sector.sector}}</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+  <button id="node-saveButton" class="btn btn-sm btn-success" [disabled]="!tareaForm.form.valid">Guardar</button>
+  <button id="node-cancelButton" class="btn btn-sm btn-danger">Cancelar</button>
 </div>
 
 <div id="mynetwork" class="border rounded border-dark">
-
 </div>

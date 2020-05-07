@@ -66,6 +66,11 @@
           <select class="form-control text-dark" [(ngModel)]="tarea.sector.id" name="sector" required #sector="ngModel">
             <option *ngFor="let sector of sectores" [value]="sector.id">{{sector.sector}}</option>
           </select>
+          <div class="alert alert-danger" *ngIf="sector.invalid && (sector.dirty || sector.touched)">
+            <div *ngIf="sector.errors.required">
+              Sector es requerido.
+            </div>
+          </div>
         </div>
       </div>
 

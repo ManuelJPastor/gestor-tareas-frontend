@@ -162,7 +162,6 @@ export class TareasFormComponent implements OnInit {
 
   create(): void{
     this.completarJsonTarea()
-    console.log(this.tarea)
     this.tareaService.create(this.tarea).subscribe(response => {
       this.router.navigate(['/tareas'])
       Swal.fire('Nueva Tarea',`${response.mensaje}: ${response.tarea.titulo}`, 'success')
@@ -201,7 +200,6 @@ export class TareasFormComponent implements OnInit {
   }
 
   cambioTareaPadre(): void{
-    console.log("hola")
     this.tarea.tareasPrecedentes = this.tarea.tareaPadre.tareasPrecedentes;
   }
 

@@ -11,7 +11,7 @@ import { SectorService } from './sector.service';
 })
 export class SectoresComponent implements OnInit {
 
-  sectores: Sector[];
+  sectores: Sector[] = new Array<Sector>();
 
   page_number: number = 1;
   page_size: number = 10;

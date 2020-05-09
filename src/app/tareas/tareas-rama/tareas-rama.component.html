@@ -1,9 +1,6 @@
 <div class="row mb-2">
-  <div class="col-3">
-    <button class="btn btn-sm btn-primary" (click)="ramaTareaPadre()" *ngIf="tareaPadre!=null">{{tareaPadre.titulo}}</button>
-  </div>
-  <div class="offset-6 col-3 text-right">
-    <button class="btn btn-sm btn-primary" (click)="abrirSubtareas()" [disabled]="!hasSubTareas">Abrir Rama SubTareas</button>
+  <div class="col-12 text-center">
+    <button class="btn btn-lg btn-primary w-25" (click)="ramaTareaPadre()" *ngIf="tareaPadre!=null">{{tareaPadre.titulo}}</button>
   </div>
 </div>
 
@@ -52,5 +49,22 @@
   <button id="node-cancelButton" class="btn btn-sm btn-danger">Cancelar</button>
 </div>
 
+<div id="edicion-estado">
+  <button class="btn btn-secondary" role="button" *ngIf="editTarea.estado=='Pendiente'" disabled>No disponible</button>
+  <button class="btn btn-success" role="button" *ngIf="editTarea.estado=='Disponible'" (click)="empezarTarea()">Empezar tarea</button>
+  <button class="btn btn-warning" role="button" *ngIf="editTarea.estado=='enProceso' && hasSubTareas" disabled>En proceso</button>
+  <button class="btn btn-danger" role="button" *ngIf="editTarea.estado=='enProceso' && !hasSubTareas" (click)="finalizarTarea()">Finalizar tarea</button>
+  <button class="btn btn-danger" role="button" *ngIf="editTarea.estado=='Finalizada'" disabled>Tarea finalizada</button>
+</div>
+
 <div id="mynetwork" class="border rounded border-dark">
+</div>
+
+<div class="font-weight-bold">
+  <div class="d-inline">Leyenda: </div>
+  <div class="text-primary d-inline mx-4">Actual</div>
+  <div class="text-secondary d-inline mx-4">Pendiente</div>
+  <div class="text-success d-inline mx-4">Disponible</div>
+  <div class="text-warning d-inline mx-4">EnProceso</div>
+  <div class="text-danger d-inline mx-4">Finalizada</div>
 </div>

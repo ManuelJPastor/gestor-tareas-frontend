@@ -49,7 +49,6 @@ export class SectoresFormComponent implements OnInit {
   deleteActor(actor:Actor): void{
     let index = this.sector.actores.indexOf(actor);
     this.sector.actores.splice(index, 1);
-    console.log(this.sector);
   }
 
   create(): void{

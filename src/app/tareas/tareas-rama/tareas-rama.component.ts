@@ -29,8 +29,7 @@ private sectores: Sector[];
 private clusterOptionsByData = [];
 
 private ramaTareas: Tarea[];
-
-private hasSubTareas:Boolean;
+private hasSubTareas: boolean;
 
 constructor(private tareaService: TareaService, private sectorService: SectorService, private activatedRoute: ActivatedRoute, private router: Router) { }
 
@@ -60,7 +59,6 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
         this.tareaService.getTarea(this.network.getSelectedNodes()[0]).subscribe(tarea => {
           this.tareaPadre = tarea;
         })
-        this.hasSubTareas=false
         this.crearRama(subTareas);
       })
     }
@@ -80,16 +78,38 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
       this.edges = new DataSet<any>();
 
       tareas.forEach(tarea => {
-
         var node
-        if(tarea.id == this.tarea.id){
-
-          node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector,
-                      color: {border: '#FE0303',  background: '#FF4444',
-                              highlight: { border: '#FE0303', background: '#FF4444'}}, subTareas: false};
-        } else{
-          node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector, subTareas: false};
+        switch(tarea.estado){
+          case "Pendiente":
+            node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector,
+                        color: {border: '#343a40',  background: '#B4B8BB',
+                                highlight: { border: '#343a40', background: '#B4B8BB'}}, subTareas: false};
+            break;
+          case "Disponible":
+            node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector,
+                      color: {border: '#1E8134',  background: '#3BC75B',
+                              highlight: { border: '#1E8134', background: '#3BC75B'}}, subTareas: false};
+            break;
+          case "enProceso":
+            node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector,
+                      color: {border: '#DAA609',  background: '#ffc107',
+                              highlight: { border: '#DAA609', background: '#ffc107'}}, subTareas: false};
+            break;
+          case "Finalizada":
+            node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector,
+                      color: {border: '#B82C39',  background: '#FF4444',
+                              highlight: { border: '#B82C39', background: '#FF4444'}}, subTareas: false};
+            break;
         }
+
+        if(tarea.id == this.tarea.id){
+          node.borderWidth = 2;
+          node.borderWidthSelected = 3;
+          node.color.border = '#077BBA';
+          node.color.highlight.border = '#077BBA';
+        }
+
+
         this.tareaService.getSubTareas(tarea.id).subscribe(subTareas => {
           if(subTareas.length!=0){
             node.subTareas = true;
@@ -162,28 +182,32 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
           layout: {
             hierarchical: {
                 direction: 'UD',
+                levelSeparation: 150,
                 nodeSpacing: 250,
+                treeSpacing: 400,
+                blockShifting: true,
+
                 //parentCentralization: false
             }
           },
           interaction: {
-            dragNodes: false,
+            dragNodes: true,
             //dragView: false,
             multiselect: false,
             //zoomView: false,
             selectConnectedEdges: false
           },
           manipulation: {
+            initiallyActive: true,
             addNode: (data, callback) => {
-              // filling in the popup DOM elements
               document.getElementById("node-operation").innerHTML = "Añadir Tarea";
               this.editNode(data, this.clearNodePopUp, callback);
             },
-            /*editNode: (data, callback) => {
-              // filling in the popup DOM elements
-              document.getElementById("node-operation").innerHTML = "Editar Tarea";
-              this.editNode(data, this.cancelNodeEdit, callback);
-            },*/
+            editNode: (data, callback) => {
+              if(data!=null){
+                this.router.navigate(['/tareas/form', data.id]);
+              }
+            },
             deleteNode: (data, callback) => {
               this.deleteNode(data, callback);
             },
@@ -194,59 +218,56 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
               }
               this.editEdgeWithoutDrag(data, callback);
             },
-            editEdge: false/*{
-              editWithoutDrag: (data, callback) => {
-                document.getElementById("edge-operation").innerHTML = "Editar tarea precedente";
-                this.editEdgeWithoutDrag(data, callback);
-              }
-            }*/,
+            editEdge: false,
             deleteEdge: (data, callback) => {
               this.deleteEdge(data, callback);
             }
           },
           physics:{
-            enabled: true
+            enabled: false,
+            hierarchicalRepulsion: {
+              centralGravity: 1.0,
+              springLength: 200,
+              springConstant: 0.99,
+              nodeDistance: 200,
+              damping: 0.1,
+            },
           }
         };
 
 
         setTimeout( () => {
           this.network = new Network(container, data, options);
-          this.network.editNode();
 
           this.network.on('doubleClick', (event)=> {
-            var nodos = event.nodes
-            if(nodos.length!=0){
-              this.router.navigate(['/tareas/form',nodos[0]])
-            }
+            this.abrirSubtareas();
           })
 
-          this.network.on('selectNode', (params) => {
-            if (params.nodes.length == 1) {
-
-              var node = this.nodes.get({
-                filter: function (node) {
-                  return node.id == params.nodes[0];
-                }
+          this.network.on('hold', (params)=>{
+            let id = params.nodes[0]
+            if(id!=null){
+              this.tareaService.getTarea(id).subscribe(tarea => {
+                this.editTarea = tarea
+                this.tareaService.getSubTareas(this.editTarea.id).subscribe(subTareas => {
+                  if(subTareas.length==0){
+                    this.hasSubTareas = false;
+                  } else{
+                    subTareas.forEach(subTarea => {
+                      if(subTarea.estado!="Finalizada"){
+                        this.hasSubTareas = true;
+                      }
+                    })
+                  }
+                })
+                document.getElementById("edicion-estado").style.display = "block";
               })
-              if(node[0].subTareas){
-                this.hasSubTareas=true;
-              } else{
-                this.hasSubTareas=false;
-              }
+
             }
           })
 
-          this.network.on('deselectNode', (params) => {
-            if (params.nodes.length == 0) {
-              this.hasSubTareas=false;
-            }
+          this.network.on('select', (params)=>{
+            document.getElementById("edicion-estado").style.display = "none";
           })
-
-          for(var i=this.clusterOptionsByData.length-1; i>=0; i--){
-            this.network.cluster(this.clusterOptionsByData[i])
-            this.clusterOptionsByData.splice(i,1)
-          }
 
         }, 500 );
   }
@@ -273,10 +294,17 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
   }
 
   deleteNode(data, callback){
-    let index = this.ramaTareas.indexOf(this.ramaTareas.find(tarea => tarea.id == data.nodes[0]));
-    this.ramaTareas.splice(index, 1);
-    this.tareaService.delete(data.nodes[0]).subscribe(response => {});
-    this.crearRama(this.ramaTareas);
+    this.tareaService.delete(data.nodes[0]).subscribe(response => {
+      if(this.tareaPadre == null){
+        this.tareaService.getTareasPadre().subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      } else{
+        this.tareaService.getSubTareas(this.tareaPadre.id).subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      }
+    });
   }
 
 // Callback passed as parameter is ignored
@@ -292,14 +320,19 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
   }
 
   saveNodeData(data, callback) {
-
     this.editTarea.tareaPadre = this.tareaPadre;
     this.tareaService.create(this.editTarea).subscribe(response => {
-
-      this.ramaTareas.push(response.tarea)
-      this.crearRama(this.ramaTareas)
-      this.cancelNodeEdit
+      if(this.tareaPadre == null){
+        this.tareaService.getTareasPadre().subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      } else{
+        this.tareaService.getSubTareas(this.tareaPadre.id).subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      }
     })
+    this.cancelNodeEdit(callback)
   }
 
   editEdgeWithoutDrag(data, callback) {
@@ -316,8 +349,15 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
     this.ramaTareas[index].tareasPrecedentes.push(this.ramaTareas[indexPrecedente])
 
     this.tareaService.update(this.ramaTareas[index]).subscribe(response =>{
-      this.crearRama(this.ramaTareas)
-      callback(data);
+      if(this.tareaPadre == null){
+        this.tareaService.getTareasPadre().subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      } else{
+        this.tareaService.getSubTareas(this.tareaPadre.id).subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      }
     }, err => {
       let borrado = this.ramaTareas[index].tareasPrecedentes.indexOf(this.ramaTareas[indexPrecedente]);
       this.ramaTareas[index].tareasPrecedentes.splice(borrado, 1);
@@ -334,12 +374,51 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
     this.ramaTareas[index].tareasPrecedentes.splice(borrado, 1);
 
     this.tareaService.update(this.ramaTareas[index]).subscribe(response =>{
-      this.crearRama(this.ramaTareas)
-      callback(data);
+      if(this.tareaPadre == null){
+        this.tareaService.getTareasPadre().subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      } else{
+        this.tareaService.getSubTareas(this.tareaPadre.id).subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      }
     }, err => {
       this.ramaTareas[index].tareasPrecedentes.push(this.ramaTareas[indexPrecedente])
       callback(null)
     });
+  }
+
+  empezarTarea(): void{
+    this.editTarea.estado = "enProceso";
+    this.tareaService.update(this.editTarea).subscribe(response =>{
+      if(this.tareaPadre == null){
+        this.tareaService.getTareasPadre().subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      } else{
+        this.tareaService.getSubTareas(this.tareaPadre.id).subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      }
+    });
+    document.getElementById('edicion-estado').style.display = "none";
+  }
+
+  finalizarTarea(): void{
+    this.editTarea.estado = "Finalizada";
+    this.tareaService.update(this.editTarea).subscribe(response =>{
+      if(this.tareaPadre == null){
+        this.tareaService.getTareasPadre().subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      } else{
+        this.tareaService.getSubTareas(this.tareaPadre.id).subscribe(ramaTareas => {
+          this.crearRama(ramaTareas)
+        })
+      }
+    });
+    document.getElementById('edicion-estado').style.display = "none";
   }
 
 }

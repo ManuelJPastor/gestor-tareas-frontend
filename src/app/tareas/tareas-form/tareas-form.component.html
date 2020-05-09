@@ -12,10 +12,10 @@
 
     <form #tareaForm="ngForm" novalidate>
       <div class="form-group row">
-        <button class="btn btn-success col-sm-2" role="button" *ngIf="tarea.estado=='Pendiente'" disabled>No disponible</button>
+        <button class="btn btn-secondary col-sm-2" role="button" *ngIf="tarea.estado=='Pendiente'" disabled>No disponible</button>
         <button class="btn btn-success col-sm-2" role="button" *ngIf="tarea.estado=='Disponible'" (click)="empezarTarea()">Empezar tarea</button>
+        <button class="btn btn-warning col-sm-2" role="button" *ngIf="tarea.estado=='enProceso' && hasSubTareas" disabled>En proceso</button>
         <button class="btn btn-danger col-sm-2" role="button" *ngIf="tarea.estado=='enProceso' && !hasSubTareas" (click)="finalizarTarea()">Finalizar tarea</button>
-        <button class="btn btn-danger col-sm-2" role="button" *ngIf="tarea.estado=='enProceso' && hasSubTareas" disabled>En proceso</button>
         <button class="btn btn-danger col-sm-2" role="button" *ngIf="tarea.estado=='Finalizada'" disabled>Tarea finalizada</button>
       </div>
 
@@ -130,3 +130,12 @@
 
   </div>
 </div>
+
+<!--<div class="card bg-light text-dark">
+  <div class="card-header text-center">
+    <h2>Comentarios</h2>
+  </div>
+  <div class="card-body">
+
+  </div>
+</div> -->

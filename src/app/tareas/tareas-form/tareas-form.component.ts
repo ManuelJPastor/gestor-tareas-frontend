@@ -29,7 +29,7 @@ export class TareasFormComponent implements OnInit {
 
   private usuariosSettings: IDropdownSettings;
 
-  private hasSubTareas:Boolean = true;
+  private hasSubTareas:Boolean = false;
 
 
   constructor(private tareaService: TareaService, private sectorService: SectorService, private usuarioService: UsuarioService, private router: Router, private activatedRoute: ActivatedRoute) { }
@@ -81,7 +81,12 @@ export class TareasFormComponent implements OnInit {
               if(subTareas.length==0){
                 this.hasSubTareas = false;
               } else{
-                this.hasSubTareas = true;
+                subTareas.forEach(subTarea => {
+                  if(subTarea.estado!="Finalizada"){
+                    this.hasSubTareas = true;
+                  }
+                })
+
               }
             })
             if(this.tarea.tareaPadre==null){
@@ -163,7 +168,6 @@ export class TareasFormComponent implements OnInit {
   create(): void{
     this.completarJsonTarea()
     this.tareaService.create(this.tarea).subscribe(response => {
-      this.router.navigate(['/tareas'])
       Swal.fire('Nueva Tarea',`${response.mensaje}: ${response.tarea.titulo}`, 'success')
     }, err => {
       this.errores = err.error.errores as string[];
@@ -178,7 +182,6 @@ export class TareasFormComponent implements OnInit {
   update(): void{
     this.completarJsonTarea()
     this.tareaService.update(this.tarea).subscribe(response => {
-      this.router.navigate(['tareas'])
       Swal.fire('Tarea Actualizada',`${response.mensaje}: ${response.tarea.titulo}`, 'success')
     }, err => {
       this.errores = err.error.errores as string[];

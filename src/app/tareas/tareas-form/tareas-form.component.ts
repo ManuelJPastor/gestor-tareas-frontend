@@ -28,6 +28,7 @@ export class TareasFormComponent implements OnInit {
   private usuarios: Usuario[];
 
   private usuariosSettings: IDropdownSettings;
+  private actoresSettings: IDropdownSettings;
 
   private hasSubTareas:Boolean = false;
 
@@ -44,7 +45,6 @@ export class TareasFormComponent implements OnInit {
       this.usuarios = usuarios
     })
 
-
     this.usuariosSettings = {
       singleSelection: false,
       idField: 'id',
@@ -56,6 +56,19 @@ export class TareasFormComponent implements OnInit {
       searchPlaceholderText: 'Buscar por nombre',
       noDataAvailablePlaceholderText: 'No existen usuarios'
     };
+
+    this.actoresSettings = {
+      singleSelection: false,
+      idField: 'id',
+      textField: 'nombre',
+      selectAllText: 'Seleccionar todos',
+      unSelectAllText: 'Deseleccionar todos',
+      itemsShowLimit: 3,
+      allowSearchFilter: true,
+      searchPlaceholderText: 'Buscar por nombre',
+      noDataAvailablePlaceholderText: 'No existen actores'
+    };
+
   }
 
   cargarTarea(): void{
@@ -77,6 +90,7 @@ export class TareasFormComponent implements OnInit {
           this.tareaService.getTarea(id).subscribe( tarea => {
 
             this.tarea = tarea;
+            this.tarea.sector.actores = this.tarea.sector.actores.filter(actor => !actor.encargado)
             this.tareaService.getSubTareas(this.tarea.id).subscribe(subTareas => {
               if(subTareas.length==0){
                 this.hasSubTareas = false;
@@ -168,6 +182,7 @@ export class TareasFormComponent implements OnInit {
   create(): void{
     this.completarJsonTarea()
     this.tareaService.create(this.tarea).subscribe(response => {
+      this.router.navigate(['/tareas'])
       Swal.fire('Nueva Tarea',`${response.mensaje}: ${response.tarea.titulo}`, 'success')
     }, err => {
       this.errores = err.error.errores as string[];
@@ -182,6 +197,7 @@ export class TareasFormComponent implements OnInit {
   update(): void{
     this.completarJsonTarea()
     this.tareaService.update(this.tarea).subscribe(response => {
+      this.router.navigate(['/tareas'])
       Swal.fire('Tarea Actualizada',`${response.mensaje}: ${response.tarea.titulo}`, 'success')
     }, err => {
       this.errores = err.error.errores as string[];
@@ -204,6 +220,13 @@ export class TareasFormComponent implements OnInit {
 
   cambioTareaPadre(): void{
     this.tarea.tareasPrecedentes = this.tarea.tareaPadre.tareasPrecedentes;
+  }
+
+  completarSector(): void{
+    this.sectorService.getSector(this.tarea.sector.id).subscribe(sector => {
+      this.tarea.sector = sector
+      this.tarea.sector.actores = this.tarea.sector.actores.filter(actor => !actor.encargado)
+    })
   }
 
 }

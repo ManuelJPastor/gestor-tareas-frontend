@@ -44,6 +44,7 @@ export class SectoresFormComponent implements OnInit {
     } else{
       this.errores.push("Ya existe un actor con el email "+ this.actorNuevo.email);
     }
+    console.log(this.sector.actores)
   }
 
   deleteActor(actor:Actor): void{

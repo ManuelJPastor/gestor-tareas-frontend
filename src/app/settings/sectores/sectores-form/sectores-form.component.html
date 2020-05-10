@@ -14,15 +14,15 @@
 
     <form #sectorForm="ngForm">
       <div class="form-group row">
-        <label for="sector" class="col-form-label col-sm-2">Sector</label>
+        <label for="sector" class="col-form-label col-sm-2">Departamento</label>
         <div class="col-sm-4">
           <input type="text" class="form-control" [(ngModel)]="sector.sector" name="sector" required maxlength="30" #Sector="ngModel">
           <div class="alert alert-danger" *ngIf="Sector.invalid && (Sector.dirty || Sector.touched)">
             <div *ngIf="Sector.errors.required">
-              Sector es requerido.
+              Departamento requerido.
             </div>
             <div *ngIf="Sector.errors.maxlength">
-              Sector debe tener como máximo 30 caracteres.
+              Departamento debe tener como máximo 30 caracteres.
             </div>
           </div>
         </div>
@@ -37,13 +37,14 @@
                 <th class="text-center">Nombre</th>
                 <th class="text-center">Email</th>
                 <th class="text-center">Teléfono</th>
+                <th class="text-center">Encargado</th>
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
 
               <tr>
-                <td colspan="4" class="text-center h5 text-success">Añadir Actor</td>
+                <td colspan="5" class="text-center h5 text-success">Añadir Actor</td>
               </tr>
 
               <tr>
@@ -81,16 +82,22 @@
                   </div>
                 </td>
                 <td class="text-center">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch" name="customSwitch" [(ngModel)]="actorNuevo.encargado">
+                    <label class="custom-control-label" for="customSwitch"></label>
+                  </div>
+                </td>
+                <td class="text-center">
                   <button type="button" name="button" (click)='createActor()' class="btn btn-success btn-sm">Añadir</button>
                 </td>
               </tr>
 
               <tr>
-                <td colspan="4" class="text-center h5 text-primary">Lista de Actores</td>
+                <td colspan="5" class="text-center h5 text-primary">Lista de Actores</td>
               </tr>
 
               <tr>
-                <td colspan="4" class="text-center h6 text-secondary" *ngIf="sector.actores?.length == 0">No hay registros de actores</td>
+                <td colspan="5" class="text-center h6 text-secondary" *ngIf="sector.actores?.length == 0">No hay registros de actores</td>
               </tr>
 
               <tr *ngFor="let actor of sector.actores">
@@ -122,6 +129,12 @@
                     <div *ngIf="telefono.errors.pattern">
                       El formato de teléfono no es correcto.
                     </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch-{{actor.email}}" name="customSwitch-{{actor.email}}" [(ngModel)]="actor.encargado">
+                    <label class="custom-control-label" for="customSwitch-{{actor.email}}"></label>
                   </div>
                 </td>
                 <td class="text-center">

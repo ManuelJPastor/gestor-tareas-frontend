@@ -4,7 +4,7 @@
       <h5 class="card-title my-2">Listado de tareas</h5>
     </div>
     <div class="card-body text-dark">
-    <!--<div>
+    <div>
         <ul class="nav nav-tabs">
           <li class="nav-item">
             <button class="nav-link" style="outline: none" (click)="mostrarTodas=false" [ngClass]="{active: !mostrarTodas}">Mis Tareas</button>
@@ -13,7 +13,7 @@
             <button class="nav-link" style="outline: none" (click)="mostrarTodas=true" [ngClass]="{active: mostrarTodas}" >Todas</button>
           </li>
         </ul>
-      </div>-->
+      </div>
 
       <mat-paginator [length]="tareas.length" [pageSize]="page_size" [pageSizeOptions]="pageSizeOptions"
       (page)="handlePage($event)" class="paginacion"></mat-paginator>

@@ -275,11 +275,7 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
 
 
   editNode(data, cancelAction, callback) {
-    if(typeof data.id === 'number'){
-      this.tareaService.getTarea(data.id).subscribe(tarea => {
-        this.editTarea = tarea;
-      })
-    }
+    this.editTarea = new Tarea();
 
     document.getElementById("node-saveButton").onclick = this.saveNodeData.bind(
       this,

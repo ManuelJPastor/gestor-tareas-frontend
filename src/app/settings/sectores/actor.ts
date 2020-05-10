@@ -3,4 +3,5 @@ export class Actor {
   nombre: string;
   email: string;
   telefono: string;
+  encargado: boolean;
 }

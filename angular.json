@@ -37,6 +37,7 @@
               "node_modules/popper.js/dist/umd/popper.min.js",
               "node_modules/vis/dist/vis.js",
               "node_modules/vis/examples/network/exampleUtil.js",
+              "node_modules/jspdf/dist/jspdf.min.js"
             ]
           },
           "configurations": {

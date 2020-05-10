@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { TareaService } from '../tarea.service';
 import { Tarea } from '../tarea';
 import * as $ from 'jquery';
@@ -7,11 +7,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SectorService } from 'src/app/settings/sectores/sector.service';
 import { Sector } from 'src/app/settings/sectores/sector';
 import Swal from 'sweetalert2';
+import * as jsPDF from 'jspdf'
 
 @Component({
   selector: 'app-tareas-rama',
   templateUrl: './tareas-rama.component.html',
-  styleUrls: ['./tareas-rama.component.css']
+  styleUrls: ['./tareas-rama.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class TareasRamaComponent implements OnInit {
 
@@ -51,6 +53,8 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
         })
       }
     })
+
+    document.getElementById('mynetwork').style.height = (window.innerHeight - 200) + "px";
   }
 
   abrirSubtareas(): void{
@@ -152,9 +156,9 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
         var options = {
           locale: 'en',
           locales: locales,
-          autoResize: true,
+          autoResize: false,
           width: '100%',
-          height: (window.innerHeight - 200) + "px",
+          height: '100%',
           nodes: {
             shape: "box",
             margin: {
@@ -164,7 +168,18 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
               left: 10
             },
             widthConstraint: {
-              maximum: 200
+              maximum: 100
+            },
+            scaling: {
+              min: 10,
+              max: 30,
+              label: {
+                enabled: false,
+                min: 14,
+                max: 30,
+                maxVisible: 50,
+                drawThreshold: 1
+              }
             }
           },
           edges: {
@@ -182,7 +197,7 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
           layout: {
             hierarchical: {
                 direction: 'UD',
-                levelSeparation: 150,
+                levelSeparation: 120,
                 nodeSpacing: 250,
                 treeSpacing: 400,
                 blockShifting: true,
@@ -226,50 +241,61 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
           physics:{
             enabled: false,
             hierarchicalRepulsion: {
-              centralGravity: 1.0,
-              springLength: 200,
-              springConstant: 0.99,
+              centralGravity: 0.0,
+              springLength: 0,
+              springConstant: 0.1,
               nodeDistance: 200,
-              damping: 0.1,
+              damping: 0.9,
             },
           }
         };
 
+        this.network = new Network(container, data, options);
 
-        setTimeout( () => {
-          this.network = new Network(container, data, options);
+        let buttonSave = document.createElement("div");
+        buttonSave.className = "vis-button vis-guardar-rama";
+        buttonSave.onclick = () => {
+          this.imprimirRama(container);
 
-          this.network.on('doubleClick', (event)=> {
-            this.abrirSubtareas();
-          })
+        }
 
-          this.network.on('hold', (params)=>{
-            let id = params.nodes[0]
-            if(id!=null){
-              this.tareaService.getTarea(id).subscribe(tarea => {
-                this.editTarea = tarea
-                this.tareaService.getSubTareas(this.editTarea.id).subscribe(subTareas => {
-                  if(subTareas.length==0){
-                    this.hasSubTareas = false;
-                  } else{
-                    subTareas.forEach(subTarea => {
-                      if(subTarea.estado!="Finalizada"){
-                        this.hasSubTareas = true;
-                      }
-                    })
-                  }
-                })
-                document.getElementById("edicion-estado").style.display = "block";
+        let labelSave = document.createElement("div");
+        labelSave.className = "vis-label";
+        labelSave.innerHTML = 'Guardar rama';
+
+        buttonSave.appendChild(labelSave)
+        document.getElementsByClassName("vis-add")[0].before(buttonSave);
+
+        this.network.on('doubleClick', (event)=> {
+          this.abrirSubtareas();
+        })
+
+        this.network.on('hold', (params)=>{
+          let id = params.nodes[0]
+          if(id!=null){
+            this.tareaService.getTarea(id).subscribe(tarea => {
+              this.editTarea = tarea
+              this.tareaService.getSubTareas(this.editTarea.id).subscribe(subTareas => {
+                if(subTareas.length==0){
+                  this.hasSubTareas = false;
+                } else{
+                  subTareas.forEach(subTarea => {
+                    if(subTarea.estado!="Finalizada"){
+                      this.hasSubTareas = true;
+                    }
+                  })
+                }
               })
+              document.getElementById("edicion-estado").style.display = "block";
+            })
 
-            }
-          })
+          }
+        })
 
-          this.network.on('select', (params)=>{
-            document.getElementById("edicion-estado").style.display = "none";
-          })
+        this.network.on('select', (params)=>{
+          document.getElementById("edicion-estado").style.display = "none";
+        })
 
-        }, 500 );
   }
 
 
@@ -415,6 +441,105 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
       }
     });
     document.getElementById('edicion-estado').style.display = "none";
+  }
+
+  imprimirRama(container):void {
+    //container.style.opacity = '0';
+    var heigthInicial = container.style.height;
+    var widthInicial = container.style.width;
+
+    let yMin = Number.MAX_SAFE_INTEGER
+    let yMax = Number.MIN_SAFE_INTEGER
+    this.nodes.forEach(node => {
+      // Using bounding box takes node height into account
+      const boundingBox = this.network.getBoundingBox(node.id)
+      if(boundingBox.top < yMin)
+        yMin = boundingBox.top
+
+      if(boundingBox.bottom > yMax)
+        yMax = boundingBox.bottom
+    })
+
+    // Accounts for some node label clipping
+    const heightOffset = 200
+
+    // "Natural" aka 1.0 zoom height of the network
+    const naturalHeight = yMax - yMin + heightOffset
+
+    // container is a <div /> around the network with fixed px height;
+    // the child network <canvas /> is height 100%
+    container.style.height = naturalHeight + 'px'
+
+    // Lets the network adjust to its new height inherited from container,
+    // then fit() to zoom out as needed; note `autoResize` must be DISABLED for the network
+    this.network.redraw()
+    this.network.fit()
+
+    // Sometimes the network grows too wide and fit() zooms out accordingly;
+    // in this case, scale the height down and redraw/refit
+    container.style.height = this.network.getScale() * naturalHeight + 'px'
+    this.network.redraw()
+    this.network.fit()
+
+    let xMin = Number.MAX_SAFE_INTEGER
+    let xMax = Number.MIN_SAFE_INTEGER
+    this.nodes.forEach(node => {
+      // Using bounding box takes node height into account
+      const boundingBox = this.network.getBoundingBox(node.id)
+      if(boundingBox.left < xMin)
+        xMin = boundingBox.left
+
+      if(boundingBox.right > xMax)
+        xMax = boundingBox.right
+    })
+
+    // Accounts for some node label clipping
+    const widthOffset = 50
+
+    // "Natural" aka 1.0 zoom height of the network
+    const naturalWidth = xMax - xMin + widthOffset
+
+    // container is a <div /> around the network with fixed px height;
+    // the child network <canvas /> is height 100%
+    container.style.width = naturalWidth + 'px'
+
+    // Lets the network adjust to its new height inherited from container,
+    // then fit() to zoom out as needed; note `autoResize` must be DISABLED for the network
+    this.network.redraw()
+    this.network.fit()
+
+    // Sometimes the network grows too wide and fit() zooms out accordingly;
+    // in this case, scale the height down and redraw/refit
+    container.style.width = this.network.getScale() * naturalWidth + 'px'
+    this.network.redraw()
+    this.network.fit()
+
+    setTimeout( () => {
+      var canvas = document.getElementsByTagName("canvas")[0];
+      var imgData = canvas.toDataURL("rama-"+this.tarea.titulo+"/jpeg", 1.0);
+
+      let width = canvas.width;
+      let height = canvas.height;
+      let pdf;
+      pdf = new jsPDF();
+      //set the orientation
+      if(width > height){
+        pdf = new jsPDF('l', 'px', [width, height]);
+      }
+      else{
+        pdf = new jsPDF('p', 'px', [height, width]);
+      }
+      //then we get the dimensions from the 'pdf' file itself
+      width = pdf.internal.pageSize.getWidth();
+      height = pdf.internal.pageSize.getHeight();
+      pdf.addImage(imgData, 'JPEG', 0, 0,width,height);
+      pdf.save("rama-"+this.tarea.titulo+".pdf");
+      container.style.height = heigthInicial;
+      container.style.width = widthInicial;
+      this.network.redraw()
+      this.network.fit();
+      //container.style.opacity = '100';
+    }, 1000);
   }
 
 }

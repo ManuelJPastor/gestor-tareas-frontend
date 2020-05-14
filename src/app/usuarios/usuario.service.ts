@@ -20,12 +20,12 @@ export class UsuarioService {
  });
 
   constructor(private http: HttpClient, private router: Router) {
-    http.get(this.urlToken).subscribe(data => {
+    /*http.get(this.urlToken).subscribe(data => {
       const token = data['token'];
       this.httpHeaders = new HttpHeaders({'Content-Type':'application/json',
       'X-Auth-Token':token
      });
-    }, () => {});
+   }, () => {});*/
   }
 
   getUsuario(id): Observable<Usuario>{

@@ -32,7 +32,7 @@ export class UsuariosComponent implements OnInit {
   }
 
   authenticated() {
-    return this.authService.authenticated;
+    return this.authService.isUserLoggedIn();
   }
 
   ordenar(): void{

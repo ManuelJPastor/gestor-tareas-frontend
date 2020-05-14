@@ -10,13 +10,13 @@ import { HttpClient } from '@angular/common/http';
 })
 export class LoginComponent implements OnInit {
 
-  /*username: string;
+  username: string;
   password : string;
   errorMessage = 'Invalid Credentials';
   successMessage: string;
   invalidLogin = false;
-  loginSuccess = false;*/
-  credentials = {username: '', password: ''};
+  loginSuccess = false;
+  //credentials = {username: '', password: ''};
 
   constructor(
     //private route: ActivatedRoute,
@@ -29,22 +29,22 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
   }
 
-  login() {
+  /*login() {
     this.authenticationService.authenticate(this.credentials, () => {
         this.router.navigateByUrl('/');
     });
     return false;
-  }
+  }*/
 
-  /*handleLogin() {
+  handleLogin() {
     this.authenticationService.authenticationService(this.username, this.password).subscribe((result)=> {
       this.invalidLogin = false;
       this.loginSuccess = true;
       this.successMessage = 'Login Successful.';
-      this.router.navigate(['/usuarios']);
+      this.router.navigate(['/tareas']);
     }, () => {
       this.invalidLogin = true;
       this.loginSuccess = false;
     });
-  }*/
+  }
 }

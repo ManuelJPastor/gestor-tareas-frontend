@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators';
 })
 export class AuthenticationService {
 
-  authenticated = false;
+  /*authenticated = false;
   endPoint = "http://localhost:8080"
 
   constructor(private http: HttpClient) {
@@ -28,24 +28,20 @@ export class AuthenticationService {
             return callback && callback();
         });
 
-    }
+    }*/
 
-  /*// BASE_PATH: 'http://localhost:8080'
   USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser'
-
-  public username: String;
-  public password: String;
+  ROLE = 'role'
+  AUTHORIZATION = 'authorization'
 
   constructor(private http: HttpClient) {
 
   }
 
   authenticationService(username: String, password: String) {
-    return this.http.get(`http://localhost:8080/api/basicauth`,
-      { headers: { authorization: this.createBasicAuthToken(username, password) } }).pipe(map((res) => {
-        this.username = username;
-        this.password = password;
-        this.registerSuccessfulLogin(username, password);
+    let authorization = this.createBasicAuthToken(username, password);
+    return this.http.get('http://localhost:8080/user', { headers: { authorization: authorization } }).pipe(map((res) => {
+        this.registerSuccessfulLogin(res['name'], res['authorities'], authorization);
       }));
   }
 
@@ -53,14 +49,27 @@ export class AuthenticationService {
     return 'Basic ' + window.btoa(username + ":" + password)
   }
 
-  registerSuccessfulLogin(username, password) {
+  registerSuccessfulLogin(username, authorities, authorization) {
     sessionStorage.setItem(this.USER_NAME_SESSION_ATTRIBUTE_NAME, username)
+    let admin: boolean = false;
+    authorities.forEach(authority => {
+      if(authority.authority == "ADMIN"){
+        admin = true;
+      }
+    })
+    if(admin){
+      sessionStorage.setItem(this.ROLE, "ADMIN");
+    } else{
+      sessionStorage.setItem(this.ROLE, "USER");
+    }
+    sessionStorage.setItem(this.AUTHORIZATION, authorization);
+
   }
 
   logout() {
     sessionStorage.removeItem(this.USER_NAME_SESSION_ATTRIBUTE_NAME);
-    this.username = null;
-    this.password = null;
+    sessionStorage.removeItem(this.ROLE);
+    sessionStorage.removeItem(this.AUTHORIZATION);
   }
 
   isUserLoggedIn() {
@@ -76,5 +85,29 @@ export class AuthenticationService {
     let user = sessionStorage.getItem(this.USER_NAME_SESSION_ATTRIBUTE_NAME)
     if (user === null) return ''
     return user
-  }*/
+  }
+
+  isAdmin(){
+    if(this.isUserLoggedIn()){
+      let role = sessionStorage.getItem(this.ROLE);
+      if(role == "ADMIN"){
+        return true;
+      } else{
+        return false;
+      }
+    }
+    return false;
+
+  }
+
+  isUser(){
+    if(this.isUserLoggedIn()){
+      return true;
+    }
+    return false;
+  }
+
+  getAuthorization(){
+    return sessionStorage.getItem(this.AUTHORIZATION);
+  }
 }

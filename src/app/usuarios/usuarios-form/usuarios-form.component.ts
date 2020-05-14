@@ -36,7 +36,7 @@ export class UsuariosFormComponent implements OnInit {
 
   create(): void{
     this.usuarioService.create(this.usuario).subscribe(response => {
-      this.router.navigate(['/usuarios'])
+      this.router.navigate(['settings/usuarios'])
       Swal.fire('Nuevo Usuario',`${response.mensaje}: ${response.usuario.nombre}`, 'success')
     }, err => {
       this.errores = err.error.errores as string[];
@@ -47,7 +47,7 @@ export class UsuariosFormComponent implements OnInit {
 
   update(): void{
     this.usuarioService.update(this.usuario).subscribe(response => {
-      this.router.navigate(['usuarios'])
+      this.router.navigate(['settings/usuarios'])
       Swal.fire('Usuario Actualizado',`${response.mensaje}: ${response.usuario.nombre}`, 'success')
     }, err => {
       this.errores = err.error.errores as string[];

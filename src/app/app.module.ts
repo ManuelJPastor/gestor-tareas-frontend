@@ -26,23 +26,25 @@ import { SectoresFormComponent } from './settings/sectores/sectores-form/sectore
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { TareasRamaComponent } from './tareas/tareas-rama/tareas-rama.component';
 import { ExpandMode, NgxTreeSelectModule } from 'ngx-tree-select';
+import { AuthUserGuard } from './guards/authUser.guard';
+import { AuthAdminGuard } from './guards/authAdmin.guard';
 
 const routes: Routes = [
-  {path: '', redirectTo: '/usuarios', pathMatch: 'full'},
-  {path: 'home', redirectTo: '/usuarios', pathMatch: 'full'},
+  {path: '', redirectTo: '/tareas', pathMatch: 'full'},
+  {path: 'home', redirectTo: '/tareas', pathMatch: 'full'},
   {path: 'directivas', component: DirectivaComponent},
-  {path: 'usuarios', component: UsuariosComponent},
-  {path: 'usuarios/form', component: UsuariosFormComponent},
-  {path: 'usuarios/form/:id', component: UsuariosFormComponent},
   {path: 'login', component: LoginComponent},
-  {path: 'tareas', component: TareasComponent},
-  {path: 'tareas/form', component: TareasFormComponent},
-  {path: 'tareas/form/:id', component: TareasFormComponent},
-  {path: 'settings', component: SettingsComponent},
-  {path: 'settings/sectores', component: SectoresComponent},
-  {path: 'settings/sectores/form', component: SectoresFormComponent},
-  {path: 'settings/sectores/form/:id', component: SectoresFormComponent},
-  {path: 'tareas/rama/:id', component: TareasRamaComponent},
+  {path: 'tareas', component: TareasComponent, canActivate: [ AuthUserGuard]},
+  {path: 'tareas/form', component: TareasFormComponent, canActivate: [ AuthUserGuard ]},
+  {path: 'tareas/form/:id', component: TareasFormComponent, canActivate: [ AuthUserGuard ]},
+  {path: 'tareas/rama/:id', component: TareasRamaComponent, canActivate: [ AuthUserGuard ]},
+  {path: 'settings', component: SettingsComponent, canActivate: [ AuthAdminGuard ]},
+  {path: 'settings/sectores', component: SectoresComponent, canActivate: [ AuthAdminGuard ]},
+  {path: 'settings/sectores/form', component: SectoresFormComponent, canActivate: [ AuthAdminGuard ]},
+  {path: 'settings/sectores/form/:id', component: SectoresFormComponent, canActivate: [ AuthAdminGuard ]},
+  {path: 'settings/usuarios', component: UsuariosComponent, canActivate: [ AuthAdminGuard ]},
+  {path: 'usuarios/form', component: UsuariosFormComponent, canActivate: [ AuthAdminGuard ]},
+  {path: 'usuarios/form/:id', component: UsuariosFormComponent, canActivate: [ AuthAdminGuard ]},
 ];
 
 @NgModule({
@@ -81,11 +83,11 @@ const routes: Routes = [
        allowParentSelection: true,
      })
   ],
-    providers: [UsuarioService, AuthenticationService, {provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl} /*{
+    providers: [UsuarioService, AuthenticationService, {provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl} ,{
       provide: HTTP_INTERCEPTORS,
       useClass: HttpInterceptorService,
       multi: true
-    }*/],
+    }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -31,7 +31,7 @@
       </li> -->
     </ul>
 
-    <div class="navbar-nav">
+    <div class="navbar-nav" *ngIf="authenticationService.isAdmin()">
       <div class="nav-item mx-2" routerLinkActive="active">
         <a class="nav-link" routerLink="/settings"><i class="fa fa-gear fa-lg"></i></a>
       </div>

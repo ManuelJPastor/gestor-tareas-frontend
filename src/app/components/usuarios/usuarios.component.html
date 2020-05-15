@@ -1,0 +1,50 @@
+
+  <div class="card border-dark">
+    <div class="card-header">
+      <h5 class="card-title my-2">Listado de usuarios</h5>
+    </div>
+    <div class="card-body text-dark">
+
+      <mat-paginator [length]="usuarios.length" [pageSize]="page_size" [pageSizeOptions]="pageSizeOptions"
+      (page)="handlePage($event)" class="paginacion"></mat-paginator>
+
+      <div class="mb-3 text-left">
+        <button class="btn btn-primary btn-rounded" type="button" [routerLink] = "['/usuarios/form']">Crear Usuario</button>
+        <button class="btn btn-primary btn-rounded ml-3" type="button" (click)="ordenar()">Ordenar usuarios</button>
+      </div>
+
+      <div *ngIf="usuarios?.length == 0" class="alert alert-info">
+          No hay registros en la base de datos.
+      </div>
+
+      <table class="table card-table table-bordered table-striped" *ngIf="usuarios?.length>0">
+        <thead>
+          <tr>
+            <th class="text-center">Id</th>
+            <th class="text-center">Nombre</th>
+            <th class="text-center">Email</th>
+            <th class="text-center">Departamento</th>
+            <th class="text-center">Roles</th>
+            <th class="text-center">Editar</th>
+            <th class="text-center">Eliminar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let usuario of usuarios | paginacion:page_size:page_number">
+            <td class="text-center">{{usuario.id}}</td>
+            <td class="text-center">{{usuario.nombre}}</td>
+            <td class="text-center">{{usuario.email}}</td>
+            <td class="text-center">{{usuario.sector.sector}}</td>
+            <td class="text-center"><ng-container *ngFor="let role of usuario.roles; let lastcall=last">{{role.role}}<ng-container *ngIf="!lastcall">, </ng-container></ng-container></td>
+            <td class="text-center">
+              <button type="button" name="button" [routerLink]="['/usuarios/form', usuario.id]" class="btn btn-primary btn-sm">Editar</button>
+            </td>
+            <td class="text-center">
+              <button type="button" name="button" (click)='delete(usuario)' class="btn btn-danger btn-sm">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>

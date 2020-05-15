@@ -2,36 +2,35 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { HeaderComponent } from './header/header.component';
-import { FooterComponent } from './footer/footer.component';
-import { DirectivaComponent } from './directiva/directiva.component';
-import { UsuariosComponent } from './usuarios/usuarios.component';
-import { UsuarioService } from './usuarios/usuario.service';
 import { RouterModule, Routes } from '@angular/router';
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
-import { TareasComponent } from './tareas/tareas.component';
-import { LoginComponent } from './login/login.component';
-import { AuthenticationService } from './login/auth.service';
-import { HttpInterceptorService } from './http-interceptor.service';
 import { PaginacionPipe } from './pipes/paginacion.pipe';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator'
-import { CustomMatPaginatorIntl } from './paginator-es';
-import { UsuariosFormComponent } from './usuarios/usuarios-form/usuarios-form.component';
-import { TareasFormComponent } from './tareas/tareas-form/tareas-form.component';
 import { FormsModule } from '@angular/forms';
-import { SettingsComponent } from './settings/settings.component';
-import { SectoresComponent } from './settings/sectores/sectores.component';
-import { SectoresFormComponent } from './settings/sectores/sectores-form/sectores-form.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
-import { TareasRamaComponent } from './tareas/tareas-rama/tareas-rama.component';
 import { ExpandMode, NgxTreeSelectModule } from 'ngx-tree-select';
 import { AuthUserGuard } from './guards/authUser.guard';
 import { AuthAdminGuard } from './guards/authAdmin.guard';
+import { DirectivaComponent } from './components/directiva/directiva.component';
+import { LoginComponent } from './components/login/login.component';
+import { TareasComponent } from './components/tareas/tareas.component';
+import { TareasFormComponent } from './components/tareas/tareas-form/tareas-form.component';
+import { TareasRamaComponent } from './components/tareas/tareas-rama/tareas-rama.component';
+import { SettingsComponent } from './components/settings/settings.component';
+import { SectoresComponent } from './components/settings/sectores/sectores.component';
+import { SectoresFormComponent } from './components/settings/sectores/sectores-form/sectores-form.component';
+import { UsuariosComponent } from './components/usuarios/usuarios.component';
+import { UsuariosFormComponent } from './components/usuarios/usuarios-form/usuarios-form.component';
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { AuthenticationService } from './services/auth.service';
+import { UsuarioService } from './services/usuario.service';
+import { HttpInterceptorService } from './services/http-interceptor.service';
+import { CustomMatPaginatorIntl } from './pipes/paginator-es';
 
 const routes: Routes = [
-  {path: '', redirectTo: '/tareas', pathMatch: 'full'},
-  {path: 'home', redirectTo: '/tareas', pathMatch: 'full'},
+  {path: '**', redirectTo: '/tareas', pathMatch: 'full'},
   {path: 'directivas', component: DirectivaComponent},
   {path: 'login', component: LoginComponent},
   {path: 'tareas', component: TareasComponent, canActivate: [ AuthUserGuard]},

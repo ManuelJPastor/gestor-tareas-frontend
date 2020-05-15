@@ -18,6 +18,8 @@ import { UsuarioService } from 'src/app/services/usuario.service';
 })
 export class TareasFormComponent implements OnInit {
 
+  private editando: boolean;
+
   private tituloCrear:string = "Crear Tarea";
   private tituloEditar:string = "Editar Tarea";
   private errores: string[];
@@ -227,6 +229,11 @@ export class TareasFormComponent implements OnInit {
       this.tarea.sector = sector
       this.tarea.sector.actores = this.tarea.sector.actores.filter(actor => !actor.encargado)
     })
+  }
+
+  cancelarEditar(): void{
+    this.editando = false;
+    this.cargarTarea()
   }
 
 }

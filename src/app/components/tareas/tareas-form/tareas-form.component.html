@@ -11,18 +11,23 @@
   <div class="card-body">
 
     <form #tareaForm="ngForm" novalidate>
-      <div class="form-group row">
-        <button class="btn btn-secondary col-sm-2" role="button" *ngIf="tarea.estado=='Pendiente'" disabled>No disponible</button>
-        <button class="btn btn-success col-sm-2" role="button" *ngIf="tarea.estado=='Disponible'" (click)="empezarTarea()">Empezar tarea</button>
-        <button class="btn btn-warning col-sm-2" role="button" *ngIf="tarea.estado=='enProceso' && hasSubTareas" disabled>En proceso</button>
-        <button class="btn btn-danger col-sm-2" role="button" *ngIf="tarea.estado=='enProceso' && !hasSubTareas" (click)="finalizarTarea()">Finalizar tarea</button>
-        <button class="btn btn-danger col-sm-2" role="button" *ngIf="tarea.estado=='Finalizada'" disabled>Tarea finalizada</button>
+      <div class="form-group row mb-3" *ngIf="editando else buttonEditar">
+        <button class="btn btn-secondary col-sm-2 mb-3" role="button" *ngIf="tarea.estado=='Pendiente'" disabled>No disponible</button>
+        <button class="btn btn-success col-sm-2 mb-3" role="button" *ngIf="tarea.estado=='Disponible'" (click)="empezarTarea()">Empezar tarea</button>
+        <button class="btn btn-warning col-sm-2 mb-3" role="button" *ngIf="tarea.estado=='enProceso' && hasSubTareas" disabled>En proceso</button>
+        <button class="btn btn-danger col-sm-2 mb-3" role="button" *ngIf="tarea.estado=='enProceso' && !hasSubTareas" (click)="finalizarTarea()">Finalizar tarea</button>
+        <button class="btn btn-danger col-sm-2 mb-3" role="button" *ngIf="tarea.estado=='Finalizada'" disabled>Tarea finalizada</button>
       </div>
+      <ng-template #buttonEditar>
+        <div class="form-group row">
+          <button class="btn btn-primary col-sm-2 mb-3" role="button" *ngIf="tarea.id" (click)="editando = true">Editar</button>
+        </div>
+      </ng-template>
 
       <div class="form-group row">
         <label for="titulo" class="col-form-label col-sm-3">Título</label>
         <div class="col-sm-8">
-          <input type="text" class="form-control text-dark" [(ngModel)]="tarea.titulo" [placeholder]="'Introduzca el título'" name="titulo" required maxlength="50" #titulo="ngModel">
+          <input type="text" class="form-control text-dark" [(ngModel)]="tarea.titulo" [disabled]="!editando" [placeholder]="'Introduzca el título'" name="titulo" required maxlength="50" #titulo="ngModel">
           <div class="alert alert-danger" *ngIf="titulo.invalid && (titulo.dirty || titulo.touched)">
             <div *ngIf="titulo.errors.required">
               Titulo es requerido.
@@ -37,14 +42,14 @@
       <div class="form-group row">
         <label for="descripcion" class="col-form-label col-sm-3">Descripción</label>
         <div class="col-sm-8">
-          <textarea type="text" class="form-control text-dark" [(ngModel)]="tarea.descripcion" [placeholder]="'Introduzca la descripción'" name="descripcion" rows="2"></textarea>
+          <textarea type="text" class="form-control text-dark" [(ngModel)]="tarea.descripcion" [disabled]="!editando" [placeholder]="'Introduzca la descripción'" name="descripcion" rows="2"></textarea>
         </div>
       </div>
 
       <div class="form-group row">
         <label for="fechaMax" class="col-form-label col-sm-3">Fecha Máxima</label>
         <div class="col-sm-8">
-          <input type="date" class="form-control text-dark" [(ngModel)]="tarea.fechaMax" name="fechaMax" required #fechaMax="ngModel">
+          <input type="date" class="form-control text-dark" [(ngModel)]="tarea.fechaMax" [disabled]="!editando" name="fechaMax" required #fechaMax="ngModel">
           <div class="alert alert-danger" *ngIf="fechaMax.invalid && (fechaMax.dirty || fechaMax.touched)">
             <div *ngIf="fechaMax.errors.required">
               Fecha Máxima es requerida.
@@ -56,14 +61,14 @@
       <div class="form-group row">
         <label for="espacio" class="col-form-label col-sm-3">Espacio</label>
         <div class="col-sm-8">
-          <input type="text" class="form-control text-dark" [(ngModel)]="tarea.espacio" [placeholder]="'Introduzca el espacio'" name="espacio">
+          <input type="text" class="form-control text-dark" [(ngModel)]="tarea.espacio" [disabled]="!editando" [placeholder]="'Introduzca el espacio'" name="espacio">
         </div>
       </div>
 
       <div class="form-group row">
         <label for="diasAviso" class="col-form-label col-sm-3">Aviso</label>
         <div class="col-sm-8">
-          <select class="form-control text-dark" [(ngModel)]="tarea.diasAviso" name="diasAviso" #diasAviso="ngModel">
+          <select class="form-control text-dark" [(ngModel)]="tarea.diasAviso" [disabled]="!editando" name="diasAviso" #diasAviso="ngModel">
             <option [value]="0"></option>
             <option [value]="1">1 día antes</option>
             <option [value]="2">2 días antes</option>
@@ -80,7 +85,7 @@
       <div class="form-group row" *ngIf="tarea.diasAviso!=0">
         <label for="diasAviso2" class="col-form-label col-sm-3">Segundo Aviso</label>
         <div class="col-sm-8">
-          <select class="form-control text-dark" [(ngModel)]="tarea.diasAviso2" name="diasAviso2" #diasAviso2="ngModel">
+          <select class="form-control text-dark" [(ngModel)]="tarea.diasAviso2" [disabled]="!editando" name="diasAviso2" #diasAviso2="ngModel">
             <option [value]="0"></option>
             <option [value]="1">1 día antes</option>
             <option [value]="2">2 días antes</option>
@@ -97,7 +102,7 @@
       <div class="form-group row">
         <label for="sector" class="col-form-label col-sm-3">Departamento</label>
         <div class="col-sm-8">
-          <select class="form-control text-dark" (change)="completarSector()" [(ngModel)]="tarea.sector.id" name="sector" required #sector="ngModel">
+          <select class="form-control text-dark" (change)="completarSector()" [(ngModel)]="tarea.sector.id" [disabled]="!editando" name="sector" required #sector="ngModel">
             <option *ngFor="let sector of sectores" [value]="sector.id">{{sector.sector}}</option>
           </select>
           <div class="alert alert-danger" *ngIf="sector.invalid && (sector.dirty || sector.touched)">
@@ -116,6 +121,7 @@
             [placeholder]="'Seleccione los actores'"
             [data]="tarea.sector.actores"
             [(ngModel)]="tarea.actores"
+            [disabled]="!editando"
             [settings]="actoresSettings">
           </ng-multiselect-dropdown>
         </div>
@@ -129,6 +135,7 @@
               [items]="tareasPadre"
               [multiple]="false"
               [(ngModel)]="tarea.tareaPadre"
+              [disabled]="!editando"
               filterPlaceholder="Búsqueda por título"
               [allowParentSelection]="true"
               [allowFilter]="true"
@@ -145,6 +152,7 @@
               [items]="tareasPadre"
               [multiple]="true"
               [(ngModel)]="tarea.tareasPrecedentes"
+              [disabled]="!editando"
               filterPlaceholder="Búsqueda por título"
               [allowParentSelection]="true"
               [allowFilter]="true">
@@ -160,18 +168,18 @@
             [placeholder]="'Seleccione los usuarios'"
             [data]="usuarios"
             [(ngModel)]="tarea.usuarios"
+            [disabled]="!editando"
             [settings]="usuariosSettings">
           </ng-multiselect-dropdown>
         </div>
       </div>
 
       <div class="form-group row">
-        <div class="col-sm-2">
-          <button class="btn btn-primary" role="button" (click)='create()' *ngIf="!tarea.id else elseBlock" [disabled]="!tareaForm.form.valid">Crear</button>
+          <button class="btn btn-success col-sm-2 mx-2" role="button" (click)='create()' *ngIf="!tarea.id else elseBlock" [disabled]="!tareaForm.form.valid">Crear</button>
           <ng-template #elseBlock>
-            <button class="btn btn-primary" role="button" (click)='update()' [disabled]="!tareaForm.form.valid">Editar</button>
+            <button class="btn btn-success col-sm-2 mx-2" role="button" (click)='update()' *ngIf="editando" [disabled]="!tareaForm.form.valid">Guardar</button>
+            <button class="btn btn-danger col-sm-2 mx-2" role="button" (click)='cancelarEditar()' *ngIf="editando" [disabled]="!tareaForm.form.valid">Cancelar</button>
           </ng-template>
-        </div>
       </div>
     </form>
 

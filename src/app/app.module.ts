@@ -30,7 +30,7 @@ import { HttpInterceptorService } from './services/http-interceptor.service';
 import { CustomMatPaginatorIntl } from './pipes/paginator-es';
 
 const routes: Routes = [
-  {path: '**', redirectTo: '/tareas', pathMatch: 'full'},
+
   {path: 'directivas', component: DirectivaComponent},
   {path: 'login', component: LoginComponent},
   {path: 'tareas', component: TareasComponent, canActivate: [ AuthUserGuard]},
@@ -44,6 +44,7 @@ const routes: Routes = [
   {path: 'settings/usuarios', component: UsuariosComponent, canActivate: [ AuthAdminGuard ]},
   {path: 'usuarios/form', component: UsuariosFormComponent, canActivate: [ AuthAdminGuard ]},
   {path: 'usuarios/form/:id', component: UsuariosFormComponent, canActivate: [ AuthAdminGuard ]},
+  {path: '**', redirectTo: '/tareas', pathMatch: 'full'},
 ];
 
 @NgModule({

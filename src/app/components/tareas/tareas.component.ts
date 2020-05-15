@@ -3,6 +3,8 @@ import { PageEvent } from '@angular/material/paginator';
 import Swal from 'sweetalert2';
 import { Tarea } from 'src/app/objects/tarea';
 import { TareaService } from 'src/app/services/tarea.service';
+import { UsuarioService } from 'src/app/services/usuario.service';
+import { AuthenticationService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-tareas',
@@ -24,12 +26,27 @@ export class TareasComponent implements OnInit {
     this.page_number=e.pageIndex + 1
   }
 
-  constructor(private tareaService: TareaService) { }
+  constructor(private tareaService: TareaService, private usuarioService: UsuarioService, private authService: AuthenticationService) { }
 
   ngOnInit() {
-    this.tareaService.getTareas().subscribe(
-      tareas => this.tareas = tareas
-    );
+    this.tareaService.getMisTareas(this.authService.getLoggedInUserName()).subscribe(misTareas => {
+      this.tareas = misTareas;
+    })
+  }
+
+  mostrarTareas(): void{
+    this.mostrarTodas=!this.mostrarTodas;
+    this.tareas = [];
+    if(!this.mostrarTodas){
+      this.tareaService.getMisTareas(this.authService.getLoggedInUserName()).subscribe(misTareas => {
+        this.tareas = misTareas;
+      })
+    } else{
+      this.tareaService.getTareas().subscribe(tareas => {
+        this.tareas = tareas;
+      })
+    }
+
   }
 
   /*ordenar(): void{

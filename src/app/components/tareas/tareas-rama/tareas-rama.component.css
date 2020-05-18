@@ -26,10 +26,7 @@
   width: 200px;
 }
 
+
 canvas{
   background-color: #9EC7DD;
-}
-
-.vis-guardar-rama{
-  background-image: url("/assets/img/icons/save.png");
 }

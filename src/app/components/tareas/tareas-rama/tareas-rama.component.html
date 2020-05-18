@@ -1,8 +1,13 @@
-<div class="row mb-2">
-  <div class="col-12 text-center">
-    <button class="btn btn-lg btn-primary w-25" (click)="ramaTareaPadre()" *ngIf="tareaPadre!=null">{{tareaPadre.titulo}}</button>
-  </div>
+<div id="buttons" class="mb-2">
+  <button class="btn btn-secondary btn-sm mx-1" (click)="ramaTareaPadre()"  *ngIf="tareaPadre!=null"><i class="fa fa-chevron-left"></i> {{tareaPadre.titulo}}</button>
+  <button class="btn btn-light btn-sm mx-1" (click)="imprimirRama()"><i class="fa fa-save"></i> Guardar Rama</button>
+  <button class="btn btn-success btn-sm mx-1" (click)="desplegarSubTareas()" *ngIf="!desplegarSubtareas else cerrarSubtareas">Desplegar Subtareas</button>
+  <ng-template #cerrarSubtareas>
+    <button class="btn btn-danger btn-sm mx-1" (click)="desplegarSubTareas()">Cerrar Subtareas</button>
+  </ng-template>
 </div>
+
+
 
 <div id="node-popUp">
   <h3 id="node-operation" class="text-center">node</h3>

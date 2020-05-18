@@ -110,6 +110,8 @@ export class TareasFormComponent implements OnInit {
               this.tarea.tareaPadre.id = null;
             }
           })
+        }else{
+          this.editando = true
         }
       })
     });
@@ -225,10 +227,12 @@ export class TareasFormComponent implements OnInit {
   }
 
   completarSector(): void{
-    this.sectorService.getSector(this.tarea.sector.id).subscribe(sector => {
-      this.tarea.sector = sector
-      this.tarea.sector.actores = this.tarea.sector.actores.filter(actor => !actor.encargado)
-    })
+    if(this.tarea.sector.id != null){
+      this.sectorService.getSector(this.tarea.sector.id).subscribe(sector => {
+        this.tarea.sector = sector
+        this.tarea.sector.actores = this.tarea.sector.actores.filter(actor => !actor.encargado)
+      })
+    }
   }
 
   cancelarEditar(): void{

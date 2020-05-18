@@ -9,7 +9,7 @@
           <li class="nav-item">
             <button class="nav-link" style="outline: none" (click)="mostrarTareas()" [ngClass]="{active: !mostrarTodas}" [disabled]="!mostrarTodas">Mis Tareas</button>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" *ngIf="authService.isAdmin()">
             <button class="nav-link" style="outline: none" (click)="mostrarTareas()" [ngClass]="{active: mostrarTodas}" [disabled]="mostrarTodas">Todas</button>
           </li>
         </ul>
@@ -29,7 +29,11 @@
         </div>
       </div>-->
 
-      <table class="table card-table table-bordered table-striped animated pulse">
+      <div *ngIf="tareas?.length == 0" class="alert alert-info">
+          No se han encontrado tareas.
+      </div>
+
+      <table class="table card-table table-bordered table-striped" *ngIf="tareas?.length>0">
         <thead>
           <tr>
             <th class="text-center">Titulo</th>

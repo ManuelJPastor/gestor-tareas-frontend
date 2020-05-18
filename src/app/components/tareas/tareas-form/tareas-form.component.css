@@ -9,6 +9,12 @@ tree-select .dropdown .btn-secondary{
   padding-left: 12px;
 }
 
+tree-select .dropdown .btn{
+  background-color: white;
+  padding-left: 12px;
+  text-align: left;
+}
+
 tree-select .selected-item-item{
   border: gray 1px solid;
 }

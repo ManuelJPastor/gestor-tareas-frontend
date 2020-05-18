@@ -36,15 +36,16 @@ export class TareasComponent implements OnInit {
 
   mostrarTareas(): void{
     this.mostrarTodas=!this.mostrarTodas;
-    this.tareas = [];
     if(!this.mostrarTodas){
       this.tareaService.getMisTareas(this.authService.getLoggedInUserName()).subscribe(misTareas => {
         this.tareas = misTareas;
-      })
+      },
+      err => { this.tareas = [] })
     } else{
       this.tareaService.getTareas().subscribe(tareas => {
         this.tareas = tareas;
-      })
+      },
+      err => { this.tareas = [] })
     }
 
   }

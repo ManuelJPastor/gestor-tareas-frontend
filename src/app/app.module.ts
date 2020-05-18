@@ -28,6 +28,7 @@ import { AuthenticationService } from './services/auth.service';
 import { UsuarioService } from './services/usuario.service';
 import { HttpInterceptorService } from './services/http-interceptor.service';
 import { CustomMatPaginatorIntl } from './pipes/paginator-es';
+import { DatePipe } from '@angular/common';
 
 const routes: Routes = [
 
@@ -87,7 +88,7 @@ const routes: Routes = [
       provide: HTTP_INTERCEPTORS,
       useClass: HttpInterceptorService,
       multi: true
-    }],
+    }, DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

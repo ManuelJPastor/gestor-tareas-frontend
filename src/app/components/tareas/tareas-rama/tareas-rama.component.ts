@@ -8,6 +8,7 @@ import { Tarea } from 'src/app/objects/tarea';
 import { Sector } from 'src/app/objects/sector';
 import { TareaService } from 'src/app/services/tarea.service';
 import { SectorService } from 'src/app/services/sector.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-tareas-rama',
@@ -33,7 +34,9 @@ private clusterOptionsByData = [];
 private ramaTareas: Tarea[];
 private hasSubTareas: boolean;
 
-constructor(private tareaService: TareaService, private sectorService: SectorService, private activatedRoute: ActivatedRoute, private router: Router) { }
+private desplegarSubtareas: boolean = false;
+
+constructor(private datepipe: DatePipe, private tareaService: TareaService, private sectorService: SectorService, private activatedRoute: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
 
@@ -53,6 +56,7 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
         })
       }
     })
+
 
     document.getElementById('mynetwork').style.height = (window.innerHeight - 200) + "px";
   }
@@ -83,26 +87,22 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
 
       tareas.forEach(tarea => {
         var node
+        node = {id: tarea.id, label: `${tarea.titulo}\n<b>(${this.datepipe.transform(tarea.fechaMax, 'dd-MM-yyyy')})</b>`,
+                level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector, subTareas: false};
+
         switch(tarea.estado){
           case "Pendiente":
-            node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector,
-                        color: {border: '#343a40',  background: '#B4B8BB',
-                                highlight: { border: '#343a40', background: '#B4B8BB'}}, subTareas: false};
+            node.color = {border: '#343a40',  background: '#B4B8BB', highlight: { border: '#343a40', background: '#B4B8BB'}};
             break;
           case "Disponible":
-            node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector,
-                      color: {border: '#1E8134',  background: '#3BC75B',
-                              highlight: { border: '#1E8134', background: '#3BC75B'}}, subTareas: false};
+
+            node.color = {border: '#1E8134',  background: '#3BC75B', highlight: { border: '#1E8134', background: '#3BC75B'}};
             break;
           case "enProceso":
-            node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector,
-                      color: {border: '#DAA609',  background: '#ffc107',
-                              highlight: { border: '#DAA609', background: '#ffc107'}}, subTareas: false};
+            node.color = {border: '#DAA609',  background: '#ffc107', highlight: { border: '#DAA609', background: '#ffc107'}};
             break;
           case "Finalizada":
-            node = {id: tarea.id, label: tarea.titulo, level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector,
-                      color: {border: '#B82C39',  background: '#FF4444',
-                              highlight: { border: '#B82C39', background: '#FF4444'}}, subTareas: false};
+            node.color = {border: '#B82C39',  background: '#FF4444', highlight: { border: '#B82C39', background: '#FF4444'}};
             break;
         }
 
@@ -117,6 +117,11 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
         this.tareaService.getSubTareas(tarea.id).subscribe(subTareas => {
           if(subTareas.length!=0){
             node.subTareas = true;
+            if(this.desplegarSubtareas){
+              subTareas.forEach(subTarea => {
+                this.crearSubtareas(subTarea, tarea.nivel);
+              })
+            }
           }
           this.nodes.add(node);
         })
@@ -156,10 +161,13 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
         var options = {
           locale: 'en',
           locales: locales,
-          autoResize: false,
+          autoResize: true,
           width: '100%',
           height: '100%',
           nodes: {
+            font: {
+              multi: 'html'
+            },
             shape: "box",
             margin: {
               top: 10,
@@ -168,7 +176,7 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
               left: 10
             },
             widthConstraint: {
-              maximum: 100
+              maximum: 200
             },
             scaling: {
               min: 10,
@@ -213,6 +221,7 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
             selectConnectedEdges: false
           },
           manipulation: {
+            enabled: true,
             initiallyActive: true,
             addNode: (data, callback) => {
               document.getElementById("node-operation").innerHTML = "Añadir Tarea";
@@ -250,51 +259,46 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
           }
         };
 
-        this.network = new Network(container, data, options);
-
-        let buttonSave = document.createElement("div");
-        buttonSave.className = "vis-button vis-guardar-rama";
-        buttonSave.onclick = () => {
-          this.imprimirRama(container);
-
+        if(this.desplegarSubtareas){
+          options.manipulation.enabled = false;
         }
 
-        let labelSave = document.createElement("div");
-        labelSave.className = "vis-label";
-        labelSave.innerHTML = 'Guardar rama';
+        setTimeout(()=>{
+          this.network = new Network(container, data, options);
 
-        buttonSave.appendChild(labelSave)
-        document.getElementsByClassName("vis-add")[0].before(buttonSave);
+          this.network.on('doubleClick', (event)=> {
+            this.abrirSubtareas();
+          })
 
-        this.network.on('doubleClick', (event)=> {
-          this.abrirSubtareas();
-        })
-
-        this.network.on('hold', (params)=>{
-          let id = params.nodes[0]
-          if(id!=null){
-            this.tareaService.getTarea(id).subscribe(tarea => {
-              this.editTarea = tarea
-              this.tareaService.getSubTareas(this.editTarea.id).subscribe(subTareas => {
-                if(subTareas.length==0){
-                  this.hasSubTareas = false;
-                } else{
-                  subTareas.forEach(subTarea => {
-                    if(subTarea.estado!="Finalizada"){
-                      this.hasSubTareas = true;
-                    }
-                  })
-                }
+          this.network.on('hold', (params)=>{
+            let id = params.nodes[0]
+            if(id!=null){
+              this.tareaService.getTarea(id).subscribe(tarea => {
+                this.editTarea = tarea
+                this.tareaService.getSubTareas(this.editTarea.id).subscribe(subTareas => {
+                  if(subTareas.length==0){
+                    this.hasSubTareas = false;
+                  } else{
+                    subTareas.forEach(subTarea => {
+                      if(subTarea.estado!="Finalizada"){
+                        this.hasSubTareas = true;
+                      }
+                    })
+                  }
+                })
+                document.getElementById("edicion-estado").style.display = "block";
               })
-              document.getElementById("edicion-estado").style.display = "block";
-            })
 
-          }
-        })
+            }
+          })
 
-        this.network.on('select', (params)=>{
-          document.getElementById("edicion-estado").style.display = "none";
-        })
+          this.network.on('select', (params)=>{
+            document.getElementById("edicion-estado").style.display = "none";
+          })
+        }, 500)
+
+
+
 
   }
 
@@ -443,8 +447,24 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
     document.getElementById('edicion-estado').style.display = "none";
   }
 
-  imprimirRama(container):void {
-    //container.style.opacity = '0';
+  /*buttonGuardar(): void{
+    var container = document.getElementById('mynetwork');
+    let buttonSave = document.createElement("div");
+    buttonSave.className = "vis-button vis-guardar-rama";
+    buttonSave.onclick = () => {
+      this.imprimirRama();
+
+    }
+    let labelSave = document.createElement("div");
+    labelSave.className = "vis-label";
+    labelSave.innerHTML = 'Guardar rama';
+
+    buttonSave.appendChild(labelSave)
+    document.getElementsByClassName("vis-add")[0].before(buttonSave);
+  }*/
+
+  imprimirRama():void {
+    var container = document.getElementById('mynetwork');
     var heigthInicial = container.style.height;
     var widthInicial = container.style.width;
 
@@ -538,8 +558,59 @@ constructor(private tareaService: TareaService, private sectorService: SectorSer
       container.style.width = widthInicial;
       this.network.redraw()
       this.network.fit();
-      //container.style.opacity = '100';
     }, 1000);
+  }
+
+  desplegarSubTareas(): void{
+    this.desplegarSubtareas=!this.desplegarSubtareas;
+    this.crearRama(this.ramaTareas);
+  }
+
+  crearSubtareas(tarea: Tarea, nivel: number): void{
+    var node;
+    node = {id: tarea.id, label: `${tarea.titulo}\n<b>(${this.datepipe.transform(tarea.fechaMax, 'dd-MM-yyyy')})</b>`,
+            level: (nivel + tarea.nivel), fechaMax: tarea.fechaMax, sector: tarea.sector, subTareas: false};
+
+    switch(tarea.estado){
+      case "Pendiente":
+        node.color = {border: '#343a40',  background: '#B4B8BB', highlight: { border: '#343a40', background: '#B4B8BB'}};
+        break;
+      case "Disponible":
+
+        node.color = {border: '#1E8134',  background: '#3BC75B', highlight: { border: '#1E8134', background: '#3BC75B'}};
+        break;
+      case "enProceso":
+        node.color = {border: '#DAA609',  background: '#ffc107', highlight: { border: '#DAA609', background: '#ffc107'}};
+        break;
+      case "Finalizada":
+        node.color = {border: '#B82C39',  background: '#FF4444', highlight: { border: '#B82C39', background: '#FF4444'}};
+        break;
+    }
+
+    if(tarea.id == this.tarea.id){
+      node.borderWidth = 2;
+      node.borderWidthSelected = 3;
+      node.color.border = '#077BBA';
+      node.color.highlight.border = '#077BBA';
+    }
+
+    this.tareaService.getSubTareas(tarea.id).subscribe(subTareas => {
+      if(subTareas.length!=0){
+        node.subTareas = true;
+        subTareas.forEach(subTarea => {
+            this.crearSubtareas(subTarea, node.level);
+        })
+      }
+      this.nodes.add(node);
+    })
+
+    var edge = {from: tarea.id, to: tarea.tareaPadre.id, color: {color: 'red', highlight: 'red'}};
+    this.edges.add(edge);
+
+    tarea.tareasPrecedentes.forEach(tareaPrecedente => {
+      var edge = {from: tarea.id, to: tareaPrecedente.id};
+      this.edges.add(edge);
+    })
   }
 
 }

@@ -3,7 +3,7 @@ import { Sector } from './sector';
 
 export class Usuario {
   id: number;
-  nombre: string;
+  nombre: string='';
   email: string;
   sector: Sector = new Sector();
   roles: Role[] = [new Role()];

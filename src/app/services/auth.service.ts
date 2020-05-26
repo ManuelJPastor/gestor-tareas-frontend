@@ -2,40 +2,19 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { UsuarioService } from './usuario.service';
+import { Usuario } from '../objects/usuario';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
 
-  /*authenticated = false;
-  endPoint = "http://localhost:8080"
-
-  constructor(private http: HttpClient) {
-  }
-
-  authenticate(credentials, callback) {
-
-        const headers = new HttpHeaders(credentials ? {
-            Authorization : 'Basic ' + window.btoa(credentials.username + ':' + credentials.password)
-        } : {});
-
-        this.http.get(this.endPoint+'/user', {headers: headers}).subscribe(response => {
-            if (response['name']) {
-                this.authenticated = true;
-            } else {
-                this.authenticated = false;
-            }
-            return callback && callback();
-        });
-
-    }*/
-
   USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser'
   ROLE = 'role'
   AUTHORIZATION = 'authorization'
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient, private router: Router, private usuarioService: UsuarioService) {
 
   }
 

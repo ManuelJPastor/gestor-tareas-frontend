@@ -1,6 +1,7 @@
 import { Sector } from './sector';
 import { Usuario } from './usuario';
 import { Actor } from './actor';
+import { Comentario } from './comentario';
 
 export class Tarea {
   id: number;
@@ -19,4 +20,5 @@ export class Tarea {
   tareasPrecedentes: Array<Tarea> = new Array<Tarea>();
   usuarios: Usuario[] = new Array<Usuario>();
   actores: Actor[] = new Array<Actor>();
+  comentarios: Comentario[] = new Array<Comentario>();
 }

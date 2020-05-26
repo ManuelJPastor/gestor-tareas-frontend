@@ -83,6 +83,10 @@ export class UsuarioService {
     );
   }
 
+  getUsuariosByEmail(email): Observable<Usuario> {
+    return this.http.get<Usuario>(`${this.urlEndPoint}/email/${email}`, {headers: this.httpHeaders});
+  }
+
   getUsuariosBySector(id): Observable<Usuario[]> {
     return this.http.get<Usuario[]>(`${this.urlEndPoint}/sector/${id}`, {headers: this.httpHeaders});
   }

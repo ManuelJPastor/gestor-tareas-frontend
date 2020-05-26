@@ -53,10 +53,30 @@ ng-multiselect-dropdown .dropdown-btn a{
   line-height: .75!important;
 }
 
+.border-3 {
+    border-width:3px !important;
+}
+
 .no-data{
   color: #343a40;
 }
 
 .add-comentario{
   margin: 0px;
+}
+
+.inicialUsuario{
+  background-color: gray;
+  border-radius: 100%;
+  text-align: center;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 40px;
+  width: 40px;
+  color: white;
+}
+
+textarea{
+  resize: none;
 }

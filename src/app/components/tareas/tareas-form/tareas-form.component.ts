@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import * as $ from 'jquery';
@@ -9,6 +9,9 @@ import { Usuario } from 'src/app/objects/usuario';
 import { TareaService } from 'src/app/services/tarea.service';
 import { SectorService } from 'src/app/services/sector.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
+import { AuthenticationService } from 'src/app/services/auth.service';
+import { Comentario } from 'src/app/objects/comentario';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-tareas-form',
@@ -34,9 +37,11 @@ export class TareasFormComponent implements OnInit {
 
   private hasSubTareas:Boolean = false;
 
+  private usuarioLogged: Usuario = new Usuario();
 
-  constructor(private tareaService: TareaService, private sectorService: SectorService, private usuarioService: UsuarioService, private router: Router, private activatedRoute: ActivatedRoute) { }
+  private comentarioNuevo: Comentario = new Comentario();
 
+  constructor(private authService: AuthenticationService, private tareaService: TareaService, private sectorService: SectorService, private usuarioService: UsuarioService, private router: Router, private activatedRoute: ActivatedRoute, private _location: Location) { }
 
   ngOnInit() {
     this.cargarTarea();
@@ -45,7 +50,9 @@ export class TareasFormComponent implements OnInit {
     });
     this.usuarioService.getUsuarios().subscribe(usuarios => {
       this.usuarios = usuarios
+      this.usuarioLogged = this.usuarios.find(usuario => usuario.email == this.authService.getLoggedInUserName());
     })
+    //this.autosizeComentarios();
 
     this.usuariosSettings = {
       singleSelection: false,
@@ -70,7 +77,6 @@ export class TareasFormComponent implements OnInit {
       searchPlaceholderText: 'Buscar por nombre',
       noDataAvailablePlaceholderText: 'No existen actores'
     };
-
   }
 
   cargarTarea(): void{
@@ -93,6 +99,9 @@ export class TareasFormComponent implements OnInit {
 
             this.tarea = tarea;
             this.tarea.sector.actores = this.tarea.sector.actores.filter(actor => !actor.encargado)
+            this.tareaService.getComentarios(this.tarea.id).subscribe(comentarios => {
+              this.tarea.comentarios = comentarios;
+            })
             this.tareaService.getSubTareas(this.tarea.id).subscribe(subTareas => {
               if(subTareas.length==0){
                 this.hasSubTareas = false;
@@ -238,6 +247,26 @@ export class TareasFormComponent implements OnInit {
   cancelarEditar(): void{
     this.editando = false;
     this.cargarTarea()
+  }
+
+  crearComentario(): void{
+    this.comentarioNuevo.tarea = this.tarea;
+    this.comentarioNuevo.usuario = this.usuarioLogged;
+    this.tareaService.crearComentario(this.comentarioNuevo).subscribe(response => {
+      this.tarea.comentarios.push(response.comentario)
+      this.comentarioNuevo = new Comentario();
+    })
+  }
+
+  eliminarComentario(comentario): void{
+    this.tareaService.eliminarComentario(comentario.id).subscribe(response => {
+      let index = this.tarea.comentarios.indexOf(comentario)
+      this.tarea.comentarios.splice(index, 1);
+    })
+  }
+
+  volver(): void{
+    this._location.back();
   }
 
 }

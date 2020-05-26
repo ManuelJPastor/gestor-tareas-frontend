@@ -26,6 +26,7 @@
     "jquery": "^3.4.1",
     "jspdf": "^1.5.3",
     "ng-multiselect-dropdown": "^0.2.10",
+    "ngx-autosize": "^1.7.5",
     "ngx-tree-select": "^0.15.0",
     "popper.js": "^1.16.1",
     "rxjs": "~6.5.4",

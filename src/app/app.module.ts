@@ -29,6 +29,7 @@ import { UsuarioService } from './services/usuario.service';
 import { HttpInterceptorService } from './services/http-interceptor.service';
 import { CustomMatPaginatorIntl } from './pipes/paginator-es';
 import { DatePipe } from '@angular/common';
+import {AutosizeModule} from 'ngx-autosize';
 
 const routes: Routes = [
 
@@ -82,7 +83,8 @@ const routes: Routes = [
        maxVisibleItemCount: 5,
        childrenField: 'subTareas',
        allowParentSelection: true,
-     })
+     }),
+     AutosizeModule
   ],
     providers: [UsuarioService, AuthenticationService, {provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl} ,{
       provide: HTTP_INTERCEPTORS,

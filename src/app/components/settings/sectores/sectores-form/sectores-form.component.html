@@ -37,6 +37,7 @@
                 <th class="text-center">Nombre</th>
                 <th class="text-center">Email</th>
                 <th class="text-center">Teléfono</th>
+                <th class="text-center">Extensión</th>
                 <th class="text-center">Encargado</th>
                 <th class="text-center">Acciones</th>
               </tr>
@@ -75,9 +76,17 @@
                 </td>
                 <td class="text-center">
                   <input type="tel" class="form-control" [(ngModel)]="actorNuevo.telefono" placeholder="Teléfono" name="telefonoNuevo" pattern="[0-9]{9}"  #telefono="ngModel">
-                  <div class="alert alert-danger" *ngIf="telefono.invalid && (email.touched)">
+                  <div class="alert alert-danger" *ngIf="telefono.invalid && (extension.touched)">
                     <div *ngIf="telefono.errors.pattern">
                       El formato de teléfono no es correcto.
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <input type="tel" class="form-control" [(ngModel)]="actorNuevo.ext" placeholder="Extensión" name="extensionNuevo" pattern="[0-9]{3}"  #extension="ngModel">
+                  <div class="alert alert-danger" *ngIf="extension.invalid && (extension.touched)">
+                    <div *ngIf="extension.errors.pattern">
+                      El formato de extension no es correcto.
                     </div>
                   </div>
                 </td>
@@ -125,8 +134,16 @@
                 </td>
                 <td class="text-center">
                   <input type="tel" class="form-control" [(ngModel)]="actor.telefono" name="telefono-{{actor.email}}" pattern="[0-9]{9}"  #telefono="ngModel">
-                  <div class="alert alert-danger" *ngIf="telefono.invalid && (email.touched)">
+                  <div class="alert alert-danger" *ngIf="telefono.invalid && (extension.touched)">
                     <div *ngIf="telefono.errors.pattern">
+                      El formato de teléfono no es correcto.
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <input type="tel" class="form-control" [(ngModel)]="actor.ext" name="extension-{{actor.email}}" pattern="[0-9]{3}"  #extension="ngModel">
+                  <div class="alert alert-danger" *ngIf="extension.invalid && (extension.touched)">
+                    <div *ngIf="extension.errors.pattern">
                       El formato de teléfono no es correcto.
                     </div>
                   </div>

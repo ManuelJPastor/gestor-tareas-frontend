@@ -18,16 +18,25 @@
       <mat-paginator [length]="tareas.length" [pageSize]="page_size" [pageSizeOptions]="pageSizeOptions"
       (page)="handlePage($event)" class="paginacion"></mat-paginator>
 
-      <!--<div class="row mb-3 ml-0">
-        <label for="estado" class="col-form-label col-sm-3 col-md-2">Ordenar por:</label>
-        <div class="col-sm-3 col-xl-2">
-          <select class="form-control" name="estado">
-            <option [value]="nombre">Titulo</option>
-            <option [value]="fecha">Fecha</option>
-            <option [value]="estado">Estado</option>
+      <div class="mb-3 ml-0">
+        <div class="row form-group">
+          <label for="busqueda" class="col-form-label col-2">Búsqueda: </label>
+          <input id="busqueda" type="text" class="form-control col-4" name="busqueda" placeholder="Título o Descripción">
+        </div>
+        <div class="row form-group">
+          <label for="estado" class="col-form-label col-2">Estado: </label>
+          <select id="estado" class="form-control col-2" name="estado">
+            <option value="Todos">Todos</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Disponible">Disponible</option>
+            <option value="enProceso">En proceso</option>
+            <option value="Finalizada">Finalizada</option>
           </select>
         </div>
-      </div>-->
+        <div class="row form-group">
+          <button class="btn btn-primary col-4 mx-3 form-control" role="button" (click)="busqueda()">Buscar</button>
+        </div>
+      </div>
 
       <div *ngIf="tareas?.length == 0" class="alert alert-info">
           No se han encontrado tareas.
@@ -38,7 +47,7 @@
           <tr>
             <th class="text-center">Titulo</th>
             <th class="text-center">Descripción</th>
-            <th class="text-center">Fecha Máxima</th>
+            <th class="text-center" (click)="ordenarFecha()">Fecha Máxima <i class="fa fa-sort-asc" *ngIf="sortAscFecha else sortDesc"></i><ng-template #sortDesc><i class="fa fa-sort-desc"></i></ng-template></th>
             <th class="text-center">Espacio</th>
             <th class="text-center">Estado</th>
             <th class="text-center">Eliminar</th>

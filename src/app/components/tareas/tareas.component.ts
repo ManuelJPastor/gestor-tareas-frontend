@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import Swal from 'sweetalert2';
 import { Tarea } from 'src/app/objects/tarea';
 import { TareaService } from 'src/app/services/tarea.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { AuthenticationService } from 'src/app/services/auth.service';
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-tareas',
@@ -13,8 +14,11 @@ import { AuthenticationService } from 'src/app/services/auth.service';
 })
 export class TareasComponent implements OnInit {
 
-  mostrarTodas: boolean = false;
+  sortAscFecha: boolean = true;
 
+  mostrarTodas: boolean = true;
+
+  tareasAll: Tarea[] = new Array<Tarea>();
   tareas: Tarea[] = new Array<Tarea>();
 
   page_number: number = 1;
@@ -26,33 +30,85 @@ export class TareasComponent implements OnInit {
     this.page_number=e.pageIndex + 1
   }
 
-  constructor(private tareaService: TareaService, private usuarioService: UsuarioService, private authService: AuthenticationService) { }
+  constructor(private tareaService: TareaService, private usuarioService: UsuarioService, private authService: AuthenticationService, private cdr: ChangeDetectorRef,) { }
 
   ngOnInit() {
-    this.tareaService.getMisTareas(this.authService.getLoggedInUserName()).subscribe(misTareas => {
-      this.tareas = misTareas;
-    })
+    this.mostrarTareas();
+  }
+
+  busqueda(){
+    var busqueda = document.getElementById("busqueda").value;
+    var estado = document.getElementById("estado").value;
+    console.log(busqueda + estado)
+    this.tareas = this.tareasAll.filter(tarea => tarea.titulo.includes(busqueda )|| tarea.descripcion.includes(busqueda));
+    if(estado!="Todos"){
+      this.tareas = this.tareas.filter(tarea => tarea.estado == estado);
+    }
+  }
+
+  ordenarFecha(): void{
+    var ordenadas;
+    if(this.sortAscFecha){
+      ordenadas = this.tareas.sort((a, b) => {
+        if(a.fechaMax < b.fechaMax){
+          return 1
+        } else{
+          return -1
+        }
+      });
+      this.tareas = [];
+      this.cdr.detectChanges();
+      this.tareas = ordenadas;
+      this.sortAscFecha = false;
+
+    } else{
+      ordenadas = this.tareas.sort((a, b) => {
+        if(a.fechaMax > b.fechaMax){
+          return 1
+        } else{
+          return -1
+        }
+      });
+      this.tareas = [];
+      this.cdr.detectChanges();
+      this.tareas = ordenadas;
+      this.sortAscFecha = true;
+    }
   }
 
   mostrarTareas(): void{
     this.mostrarTodas=!this.mostrarTodas;
     if(!this.mostrarTodas){
       this.tareaService.getMisTareas(this.authService.getLoggedInUserName()).subscribe(misTareas => {
-        this.tareas = misTareas;
+        this.tareas = misTareas.sort((a, b) => {
+          if(a.fechaMax > b.fechaMax){
+            return 1
+          } else{
+            return -1
+          }
+        });
+        this.tareasAll = this.tareas;
       },
       err => { this.tareas = [] })
     } else{
       this.tareaService.getTareas().subscribe(tareas => {
-        this.tareas = tareas;
+        this.tareas = tareas.sort((a, b) => {
+          if(a.fechaMax > b.fechaMax){
+            return 1
+          } else{
+            return -1
+          }
+        });
+        this.tareasAll = this.tareas;
       },
       err => { this.tareas = [] })
     }
-
+    this.sortAscFecha = true;
   }
 
-  /*ordenar(): void{
-    this.tareas.sort((a,b) => b.nombre.localeCompare(a.nombre));
-  }*/
+
+
+
 
   delete(tarea: Tarea): void {
     Swal.fire({

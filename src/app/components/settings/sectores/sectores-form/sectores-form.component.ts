@@ -13,8 +13,8 @@ import { Sector } from 'src/app/objects/sector';
 export class SectoresFormComponent implements OnInit {
 
   private sector: Sector = new Sector();
-  private tituloCrear:string = "Crear Sector";
-  private tituloEditar:string = "Editar Sector";
+  private tituloCrear:string = "Crear Departamento";
+  private tituloEditar:string = "Editar Departamento";
 
   private actorNuevo: Actor = new Actor();
 

@@ -39,8 +39,7 @@ export class TareasComponent implements OnInit {
   busqueda(){
     var busqueda = document.getElementById("busqueda").value;
     var estado = document.getElementById("estado").value;
-    console.log(busqueda + estado)
-    this.tareas = this.tareasAll.filter(tarea => tarea.titulo.includes(busqueda )|| tarea.descripcion.includes(busqueda));
+    this.tareas = this.tareasAll.filter(tarea => tarea.titulo.toLowerCase().includes(busqueda.toLowerCase())|| tarea.descripcion.toLowerCase().includes(busqueda.toLowerCase()));
     if(estado!="Todos"){
       this.tareas = this.tareas.filter(tarea => tarea.estado == estado);
     }

@@ -30,7 +30,7 @@ export class TareasComponent implements OnInit {
     this.page_number=e.pageIndex + 1
   }
 
-  constructor(private tareaService: TareaService, private usuarioService: UsuarioService, private authService: AuthenticationService, private cdr: ChangeDetectorRef,) { }
+  constructor(private tareaService: TareaService, private usuarioService: UsuarioService, private authService: AuthenticationService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.mostrarTareas();

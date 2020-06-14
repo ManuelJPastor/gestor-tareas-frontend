@@ -30,6 +30,7 @@ import { HttpInterceptorService } from './services/http-interceptor.service';
 import { CustomMatPaginatorIntl } from './pipes/paginator-es';
 import { DatePipe } from '@angular/common';
 import {AutosizeModule} from 'ngx-autosize';
+import { ParticipanteGuard } from './guards/participante.guard';
 
 const routes: Routes = [
 
@@ -37,7 +38,7 @@ const routes: Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'tareas', component: TareasComponent, canActivate: [ AuthUserGuard]},
   {path: 'tareas/form', component: TareasFormComponent, canActivate: [ AuthUserGuard ]},
-  {path: 'tareas/form/:id', component: TareasFormComponent, canActivate: [ AuthUserGuard ]},
+  {path: 'tareas/form/:id', component: TareasFormComponent, canActivate: [ AuthUserGuard, ParticipanteGuard ]},
   {path: 'tareas/rama/:id', component: TareasRamaComponent, canActivate: [ AuthUserGuard ]},
   {path: 'settings', component: SettingsComponent, canActivate: [ AuthAdminGuard ]},
   {path: 'settings/sectores', component: SectoresComponent, canActivate: [ AuthAdminGuard ]},
@@ -45,7 +46,7 @@ const routes: Routes = [
   {path: 'settings/sectores/form/:id', component: SectoresFormComponent, canActivate: [ AuthAdminGuard ]},
   {path: 'settings/usuarios', component: UsuariosComponent, canActivate: [ AuthAdminGuard ]},
   {path: 'usuarios/form', component: UsuariosFormComponent, canActivate: [ AuthAdminGuard ]},
-  {path: 'usuarios/form/:id', component: UsuariosFormComponent},
+  {path: 'usuarios/form/:id', component: UsuariosFormComponent, canActivate: [ AuthUserGuard ]},
   {path: '**', redirectTo: '/tareas', pathMatch: 'full'},
 ];
 

@@ -96,7 +96,6 @@ export class TareasFormComponent implements OnInit {
         let id = params['id']
         if(id){
           this.tareaService.getTarea(id).subscribe( tarea => {
-
             this.tarea = tarea;
             this.tarea.sector.actores = this.tarea.sector.actores.filter(actor => !actor.encargado)
             this.tareaService.getComentarios(this.tarea.id).subscribe(comentarios => {

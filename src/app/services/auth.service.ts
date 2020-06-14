@@ -43,7 +43,6 @@ export class AuthenticationService {
       sessionStorage.setItem(this.ROLE, "USER");
     }
     sessionStorage.setItem(this.AUTHORIZATION, authorization);
-
   }
 
   logout() {

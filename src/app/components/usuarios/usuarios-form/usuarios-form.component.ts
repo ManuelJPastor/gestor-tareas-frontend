@@ -6,6 +6,8 @@ import { Sector } from 'src/app/objects/sector';
 import { Role } from 'src/app/objects/role';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { SectorService } from 'src/app/services/sector.service';
+import { AuthenticationService } from 'src/app/services/auth.service';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-usuarios-form',
@@ -23,25 +25,30 @@ export class UsuariosFormComponent implements OnInit {
   private sectores: Sector[];
   private roles: Role[];
 
-  constructor(private usuarioService: UsuarioService, private sectorService: SectorService, private router: Router, private activatedRoute: ActivatedRoute) { }
+  constructor(private auth: AuthenticationService, private usuarioService: UsuarioService, private sectorService: SectorService, private router: Router, private activatedRoute: ActivatedRoute,  private _location: Location) { }
 
   ngOnInit() {
+    this.cargarUsuario()
     this.sectorService.getSectores().subscribe(sectores => {
       this.sectores = sectores;
     });
     this.usuarioService.getRoles().subscribe(roles => {
       this.roles = roles;
     })
-    this.cargarUsuario()
-
   }
 
   cargarUsuario(): void{
     this.activatedRoute.params.subscribe(params => {
       let id = params['id']
       if(id){
-        this.usuarioService.getUsuario(id).subscribe( usuario => {
-          this.usuario = usuario;
+        this.usuarioService.getUsuariosByEmail(this.auth.getLoggedInUserName()).subscribe(usuario => {
+          if( !this.auth.isAdmin() && usuario.id!=id){
+            this._location.back();
+          } else {
+            this.usuarioService.getUsuario(id).subscribe( usuario => {
+              this.usuario = usuario;
+            })
+          }
         })
       }
     })

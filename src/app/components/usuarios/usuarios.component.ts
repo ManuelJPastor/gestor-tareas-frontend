@@ -4,6 +4,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { AuthenticationService } from 'src/app/services/auth.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { Usuario } from 'src/app/objects/usuario';
+import { Sector } from 'src/app/objects/sector';
+import { SectorService } from 'src/app/services/sector.service';
 
 @Component({
   selector: 'app-usuarios',
@@ -13,6 +15,9 @@ import { Usuario } from 'src/app/objects/usuario';
 export class UsuariosComponent implements OnInit {
 
   usuarios: Usuario[] = new Array<Usuario>();
+  usuariosAll: Usuario[] = new Array<Usuario>();
+
+  sectores : Sector[] = new Array<Sector>();
 
   page_number: number = 1;
   page_size: number = 10;
@@ -23,12 +28,25 @@ export class UsuariosComponent implements OnInit {
     this.page_number=e.pageIndex + 1
   }
 
-  constructor(private usuarioService: UsuarioService, private authService: AuthenticationService) { }
+  constructor(private usuarioService: UsuarioService, private sectorService: SectorService, private authService: AuthenticationService) { }
 
   ngOnInit() {
-    this.usuarioService.getUsuarios().subscribe(
-      usuarios => this.usuarios = usuarios
-    );
+    this.usuarioService.getUsuarios().subscribe(usuarios => {
+        this.usuarios = usuarios;
+        this.usuariosAll = usuarios;
+    });
+    this.sectorService.getSectores().subscribe(
+      sectores => this.sectores = sectores
+    )
+  }
+
+  busqueda(){
+    var busqueda = document.getElementById("busqueda").value;
+    var sector = document.getElementById("sector").value;
+    this.usuarios = this.usuariosAll.filter(usuario => usuario.nombre.toLowerCase().includes(busqueda.toLowerCase())|| usuario.email.toLowerCase().includes(busqueda.toLowerCase()));
+    if(sector!="Todos"){
+      this.usuarios = this.usuarios.filter(usuario => usuario.sector.sector == sector);
+    }
   }
 
   authenticated() {

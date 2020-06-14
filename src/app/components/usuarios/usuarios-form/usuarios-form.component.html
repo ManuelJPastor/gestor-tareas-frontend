@@ -70,7 +70,7 @@
       <div class="form-group row">
         <label for="role" class="col-form-label col-sm-3">Role</label>
         <div class="col-sm-8">
-          <select class="form-control text-dark" [(ngModel)]="usuario.roles[0].id" name="role" required #role="ngModel">
+          <select class="form-control text-dark" [(ngModel)]="usuario.roles[0].id" name="role" required #role="ngModel" [disabled]="this.auth.isUser()">
             <option *ngFor="let role of roles" [value]="role.id">{{role.role}}</option>
           </select>
           <div class="alert alert-danger" *ngIf="role.invalid && (role.dirty || role.touched)">

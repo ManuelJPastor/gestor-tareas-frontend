@@ -45,7 +45,7 @@ const routes: Routes = [
   {path: 'settings/sectores/form/:id', component: SectoresFormComponent, canActivate: [ AuthAdminGuard ]},
   {path: 'settings/usuarios', component: UsuariosComponent, canActivate: [ AuthAdminGuard ]},
   {path: 'usuarios/form', component: UsuariosFormComponent, canActivate: [ AuthAdminGuard ]},
-  {path: 'usuarios/form/:id', component: UsuariosFormComponent, canActivate: [ AuthAdminGuard ]},
+  {path: 'usuarios/form/:id', component: UsuariosFormComponent},
   {path: '**', redirectTo: '/tareas', pathMatch: 'full'},
 ];
 

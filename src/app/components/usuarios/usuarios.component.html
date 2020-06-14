@@ -9,8 +9,24 @@
       (page)="handlePage($event)" class="paginacion"></mat-paginator>
 
       <div class="mb-3 text-left">
-        <button class="btn btn-primary btn-rounded" type="button" [routerLink] = "['/usuarios/form']">Crear Usuario</button>
-        <button class="btn btn-primary btn-rounded ml-3" type="button" (click)="ordenar()">Ordenar usuarios</button>
+        <button class="btn btn-success btn-rounded" type="button" [routerLink] = "['/usuarios/form']">Crear Usuario</button>
+      </div>
+
+      <div class="mb-3 ml-0">
+        <div class="row form-group">
+          <label for="busqueda" class="col-form-label col-2">Búsqueda: </label>
+          <input id="busqueda" type="text" class="form-control col-4" name="busqueda" placeholder="Nombre o Email">
+        </div>
+        <div class="row form-group">
+          <label for="sector" class="col-form-label col-2">Departamento: </label>
+          <select id="sector" class="form-control col-2" name="sector">
+            <option value="Todos">Todos</option>
+            <option *ngFor="let sector of sectores" value="{{sector.sector}}">{{sector.sector}}</option>
+          </select>
+        </div>
+        <div class="row form-group">
+          <button class="btn btn-primary col-4 mx-3 form-control" role="button" (click)="busqueda()">Buscar</button>
+        </div>
       </div>
 
       <div *ngIf="usuarios?.length == 0" class="alert alert-info">

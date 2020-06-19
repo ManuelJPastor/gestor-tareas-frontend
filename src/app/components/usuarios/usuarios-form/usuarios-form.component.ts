@@ -41,14 +41,9 @@ export class UsuariosFormComponent implements OnInit {
     this.activatedRoute.params.subscribe(params => {
       let id = params['id']
       if(id){
-        this.usuarioService.getUsuariosByEmail(this.auth.getLoggedInUserName()).subscribe(usuario => {
-          if( !this.auth.isAdmin() && usuario.id!=id){
-            this._location.back();
-          } else {
-            this.usuarioService.getUsuario(id).subscribe( usuario => {
-              this.usuario = usuario;
-            })
-          }
+        this.usuarioService.getUsuario(id).subscribe( usuario => {
+          this.usuario = usuario
+          this.usuario.password="";
         })
       }
     })
@@ -67,7 +62,12 @@ export class UsuariosFormComponent implements OnInit {
 
   update(): void{
     this.usuarioService.update(this.usuario).subscribe(response => {
-      this.router.navigate(['settings/usuarios'])
+      if(this.auth.isAdmin()){
+        this.router.navigate(['settings/usuarios'])
+      } else{
+        this.router.navigate(['tareas'])
+      }
+
       Swal.fire('Usuario Actualizado',`${response.mensaje}: ${response.usuario.nombre}`, 'success')
     }, err => {
       this.errores = err.error.errores as string[];

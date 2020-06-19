@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { finalize } from 'rxjs/operators'
 import { AuthenticationService } from 'src/app/services/auth.service';
 import { Usuario } from 'src/app/objects/usuario';
 import { UsuarioService } from 'src/app/services/usuario.service';

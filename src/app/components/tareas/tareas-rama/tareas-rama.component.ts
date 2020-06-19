@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import * as $ from 'jquery';
 import { Network, DataSet } from 'vis';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -9,6 +8,10 @@ import { Sector } from 'src/app/objects/sector';
 import { TareaService } from 'src/app/services/tarea.service';
 import { SectorService } from 'src/app/services/sector.service';
 import { DatePipe } from '@angular/common';
+import { AuthenticationService } from 'src/app/services/auth.service';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
+import { Usuario } from 'src/app/objects/usuario';
+import { UsuarioService } from 'src/app/services/usuario.service';
 
 @Component({
   selector: 'app-tareas-rama',
@@ -28,6 +31,9 @@ private editTarea: Tarea = new Tarea();
 private tarea: Tarea;
 private tareaPadre: Tarea = null;
 private sectores: Sector[];
+private usuarios: Usuario[];
+
+private usuariosSettings: IDropdownSettings;
 
 private clusterOptionsByData = [];
 
@@ -36,13 +42,43 @@ private hasSubTareas: boolean;
 
 private desplegarSubtareas: boolean = false;
 
-constructor(private datepipe: DatePipe, private tareaService: TareaService, private sectorService: SectorService, private activatedRoute: ActivatedRoute, private router: Router) { }
+private leyenda: {actual: any, pendiente: any, disponible: any, enProceso: any, finalizada: any};
+private colores = {
+                  azul: {border: '#026AA2',  background: '#077BBA', highlight: { border: '#026AA2', background: '#077BBA'}},
+                  gris: {border: '#343a40',  background: '#B4B8BB', highlight: { border: '#343a40', background: '#B4B8BB'}},
+                  verde: {border: '#1E8134',  background: '#3BC75B', highlight: { border: '#1E8134', background: '#3BC75B'}},
+                  amarillo: {border: '#DAA609',  background: '#ffc107', highlight: { border: '#DAA609', background: '#ffc107'}},
+                  rojo: {border: '#B82C39',  background: '#FF4444', highlight: { border: '#B82C39', background: '#FF4444'}}
+                };
+
+constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, private tareaService: TareaService, private sectorService: SectorService, private activatedRoute: ActivatedRoute, private router: Router, private auth: AuthenticationService) { }
 
   ngOnInit(): void {
+
+    this.leyenda = {actual:  this.colores.azul.background,
+      pendiente: this.colores.gris,
+      disponible: this.colores.verde,
+      enProceso: this.colores.amarillo,
+      finalizada: this.colores.rojo}
 
     this.sectorService.getSectores().subscribe(sectores => {
       this.sectores = sectores
     })
+    this.usuarioService.getUsuarios().subscribe(usuarios => {
+      this.usuarios = usuarios
+    })
+    //ajustes select usuarios
+    this.usuariosSettings = {
+      singleSelection: false,
+      idField: 'id',
+      textField: 'nombre',
+      selectAllText: 'Seleccionar todos',
+      unSelectAllText: 'Deseleccionar todos',
+      itemsShowLimit: 3,
+      allowSearchFilter: true,
+      searchPlaceholderText: 'Buscar por nombre',
+      noDataAvailablePlaceholderText: 'No existen usuarios'
+    };
 
     this.activatedRoute.params.subscribe(params => {
       let id = params['id']
@@ -57,8 +93,20 @@ constructor(private datepipe: DatePipe, private tareaService: TareaService, priv
       }
     })
 
-
+    document.getElementById('mynetwork').oncontextmenu = function() {return false;}
     document.getElementById('mynetwork').style.height = (window.innerHeight - 200) + "px";
+  }
+
+  cambiarLeyenda(tipo: string): void{
+    var color = document.getElementById(tipo).value
+    if(tipo == 'actual'){
+      this.leyenda[tipo] = this.colores[color].background
+    }else{
+      this.leyenda[tipo] = this.colores[color]
+    }
+
+    this.crearRama(this.ramaTareas)
+
   }
 
   abrirSubtareas(): void{
@@ -92,25 +140,24 @@ constructor(private datepipe: DatePipe, private tareaService: TareaService, priv
 
         switch(tarea.estado){
           case "Pendiente":
-            node.color = {border: '#343a40',  background: '#B4B8BB', highlight: { border: '#343a40', background: '#B4B8BB'}};
+            node.color = Object.assign({} , this.leyenda.pendiente);
             break;
           case "Disponible":
-
-            node.color = {border: '#1E8134',  background: '#3BC75B', highlight: { border: '#1E8134', background: '#3BC75B'}};
+            node.color = Object.assign({} , this.leyenda.disponible);
             break;
           case "enProceso":
-            node.color = {border: '#DAA609',  background: '#ffc107', highlight: { border: '#DAA609', background: '#ffc107'}};
+            node.color = Object.assign({} , this.leyenda.enProceso);
             break;
           case "Finalizada":
-            node.color = {border: '#B82C39',  background: '#FF4444', highlight: { border: '#B82C39', background: '#FF4444'}};
+            node.color = Object.assign({} , this.leyenda.finalizada)
             break;
         }
 
         if(tarea.id == this.tarea.id){
           node.borderWidth = 2;
           node.borderWidthSelected = 3;
-          node.color.border = '#077BBA';
-          node.color.highlight.border = '#077BBA';
+          node.color.border = this.leyenda.actual;
+          node.color.highlight.border = this.leyenda.actual;
         }
 
 
@@ -233,18 +280,66 @@ constructor(private datepipe: DatePipe, private tareaService: TareaService, priv
               }
             },
             deleteNode: (data, callback) => {
-              this.deleteNode(data, callback);
+              this.tareaService.getMisTareas(this.auth.getLoggedInUserName()).subscribe(tareas => {
+                if(tareas.find(tarea => tarea.id == data.nodes[0]) || this.auth.isAdmin()){
+                  Swal.fire({
+                    title: '¿Estas seguro?',
+                    text: `¿Desea eliminar la tarea?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '!Sí, elimínalo!'
+                  }).then((result) => {
+                    if (result.value) {
+                      this.deleteNode(data, callback);
+                    }
+                  })
+
+                }else{
+                  Swal.fire(
+                    'Fallo de permisos',
+                    'Se necesita ser participante en la tarea para eliminarla.',
+                    'error'
+                  )
+                }
+              })
+              callback(null);
+
+
             },
             addEdge: (data, callback) => {
               if (data.from == data.to) {
                 callback(null);
                 return;
               }
-              this.editEdgeWithoutDrag(data, callback);
+              this.tareaService.getMisTareas(this.auth.getLoggedInUserName()).subscribe(tareas => {
+                if(tareas.find(tarea => tarea.id == data.from) || this.auth.isAdmin()){
+                  this.editEdgeWithoutDrag(data, callback);
+                } else{
+                  Swal.fire(
+                    'Fallo de permisos',
+                    'Se necesita ser participante en la tarea para añadir una tarea precedente.',
+                    'error'
+                  )
+                }
+              })
             },
             editEdge: false,
             deleteEdge: (data, callback) => {
-              this.deleteEdge(data, callback);
+              let id = this.edges._data[data.edges[0]].from
+              this.tareaService.getMisTareas(this.auth.getLoggedInUserName()).subscribe(tareas => {
+                if(tareas.find(tarea => tarea.id == id) || this.auth.isAdmin()){
+                  this.deleteEdge(data, callback);
+                } else{
+                  Swal.fire(
+                    'Fallo de permisos',
+                    'Se necesita ser participante en la tarea para añadir una tarea precedente.',
+                    'error'
+                  )
+                  callback(null)
+                }
+              })
             }
           },
           physics:{
@@ -271,25 +366,28 @@ constructor(private datepipe: DatePipe, private tareaService: TareaService, priv
           })
 
           this.network.on('hold', (params)=>{
-            let id = params.nodes[0]
-            if(id!=null){
-              this.tareaService.getTarea(id).subscribe(tarea => {
-                this.editTarea = tarea
-                this.tareaService.getSubTareas(this.editTarea.id).subscribe(subTareas => {
-                  if(subTareas.length==0){
-                    this.hasSubTareas = false;
-                  } else{
-                    subTareas.forEach(subTarea => {
-                      if(subTarea.estado!="Finalizada"){
-                        this.hasSubTareas = true;
+            this.tareaService.getMisTareas(this.auth.getLoggedInUserName()).subscribe(tareas => {
+              if(tareas.find(tarea => tarea.id == params.nodes[0]) || this.auth.isAdmin()){
+                let id = params.nodes[0]
+                if(id!=null){
+                  this.tareaService.getTarea(id).subscribe(tarea => {
+                    this.editTarea = tarea
+                    this.tareaService.getSubTareas(this.editTarea.id).subscribe(subTareas => {
+                      if(subTareas.length==0){
+                        this.hasSubTareas = false;
+                      } else{
+                        subTareas.forEach(subTarea => {
+                          if(subTarea.estado!="Finalizada"){
+                            this.hasSubTareas = true;
+                          }
+                        })
                       }
                     })
-                  }
-                })
-                document.getElementById("edicion-estado").style.display = "block";
-              })
-
-            }
+                    document.getElementById("edicion-estado").style.display = "block";
+                  })
+                }
+              }
+            })
           })
 
           this.network.on('select', (params)=>{
@@ -330,6 +428,11 @@ constructor(private datepipe: DatePipe, private tareaService: TareaService, priv
           this.crearRama(ramaTareas)
         })
       }
+      Swal.fire(
+        '¡Eliminada!',
+        'La tarea ha sido borrada.',
+        'success'
+      )
     });
   }
 
@@ -447,22 +550,6 @@ constructor(private datepipe: DatePipe, private tareaService: TareaService, priv
     document.getElementById('edicion-estado').style.display = "none";
   }
 
-  /*buttonGuardar(): void{
-    var container = document.getElementById('mynetwork');
-    let buttonSave = document.createElement("div");
-    buttonSave.className = "vis-button vis-guardar-rama";
-    buttonSave.onclick = () => {
-      this.imprimirRama();
-
-    }
-    let labelSave = document.createElement("div");
-    labelSave.className = "vis-label";
-    labelSave.innerHTML = 'Guardar rama';
-
-    buttonSave.appendChild(labelSave)
-    document.getElementsByClassName("vis-add")[0].before(buttonSave);
-  }*/
-
   imprimirRama():void {
     var container = document.getElementById('mynetwork');
     var heigthInicial = container.style.height;
@@ -573,33 +660,34 @@ constructor(private datepipe: DatePipe, private tareaService: TareaService, priv
 
     switch(tarea.estado){
       case "Pendiente":
-        node.color = {border: '#343a40',  background: '#B4B8BB', highlight: { border: '#343a40', background: '#B4B8BB'}};
+        node.color = this.leyenda.pendiente;
         break;
       case "Disponible":
-
-        node.color = {border: '#1E8134',  background: '#3BC75B', highlight: { border: '#1E8134', background: '#3BC75B'}};
+        node.color = this.leyenda.disponible;
         break;
       case "enProceso":
-        node.color = {border: '#DAA609',  background: '#ffc107', highlight: { border: '#DAA609', background: '#ffc107'}};
+        node.color = this.leyenda.enProceso;
         break;
       case "Finalizada":
-        node.color = {border: '#B82C39',  background: '#FF4444', highlight: { border: '#B82C39', background: '#FF4444'}};
+        node.color = this.leyenda.finalizada;
         break;
     }
 
     if(tarea.id == this.tarea.id){
       node.borderWidth = 2;
       node.borderWidthSelected = 3;
-      node.color.border = '#077BBA';
-      node.color.highlight.border = '#077BBA';
+      node.color.border = this.leyenda.actual;
+      node.color.highlight.border = this.leyenda.actual;
     }
 
     this.tareaService.getSubTareas(tarea.id).subscribe(subTareas => {
       if(subTareas.length!=0){
         node.subTareas = true;
-        subTareas.forEach(subTarea => {
-            this.crearSubtareas(subTarea, node.level);
-        })
+        if(this.desplegarSubtareas){
+          subTareas.forEach(subTarea => {
+              this.crearSubtareas(subTarea, node.level);
+          })
+        }
       }
       this.nodes.add(node);
     })

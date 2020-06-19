@@ -17,7 +17,7 @@ export class ParticipanteGuard implements CanActivate {
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) : Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
     this.tareaService.getMisTareas(this.auth.getLoggedInUserName()).subscribe(tareas => {
-      if(tareas.find(tarea => tarea.id == next.params.id)){
+      if(tareas.find(tarea => tarea.id == next.params.id) || this.auth.isAdmin()){
         return true;
       }else{
         this._location.back();

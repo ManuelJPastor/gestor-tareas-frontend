@@ -12,7 +12,9 @@
   </ng-template>
   <div class="card-body">
 
+    <!--Formulario-->
     <form #tareaForm="ngForm" novalidate>
+      <!-- Modificar estado de tarea -->
       <div class="form-group row mb-3" *ngIf="editando else buttonEditar">
         <button class="btn btn-secondary col-sm-2 mb-3" role="button" *ngIf="tarea.estado=='Pendiente'" disabled>No disponible</button>
         <button class="btn btn-success col-sm-2 mb-3" role="button" *ngIf="tarea.estado=='Disponible'" (click)="empezarTarea()">Empezar tarea</button>
@@ -195,6 +197,7 @@
   </div>
 </div>
 
+<!--Comentarios-->
 <div class="card bg-light text-dark mt-2">
   <div class="card-header text-center">
     <h2>Comentarios</h2>
@@ -216,7 +219,7 @@
       </div>
       <div class="card-body">
        <textarea type="text" class="form-control text-dark bg-white" style="height: 100px;" autosize disabled>{{comentario.comentario}}</textarea>
-       <button class="btn btn-danger btn-sm float-right mt-1" *ngIf="comentario.usuario.email == usuarioLogged.email" (click)="eliminarComentario(comentario)">Eliminar</button>
+       <button class="btn btn-danger btn-sm float-right mt-1" *ngIf="(comentario.usuario.email == usuarioLogged.email) || authService.isAdmin()" (click)="eliminarComentario(comentario)">Eliminar</button>
       </div>
     </div>
 

@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import * as $ from 'jquery';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Tarea } from 'src/app/objects/tarea';
 import { Sector } from 'src/app/objects/sector';
@@ -52,8 +51,8 @@ export class TareasFormComponent implements OnInit {
       this.usuarios = usuarios
       this.usuarioLogged = this.usuarios.find(usuario => usuario.email == this.authService.getLoggedInUserName());
     })
-    //this.autosizeComentarios();
 
+    //ajustes select usuarios
     this.usuariosSettings = {
       singleSelection: false,
       idField: 'id',
@@ -66,6 +65,7 @@ export class TareasFormComponent implements OnInit {
       noDataAvailablePlaceholderText: 'No existen usuarios'
     };
 
+    //ajustes select actores
     this.actoresSettings = {
       singleSelection: false,
       idField: 'id',
@@ -84,16 +84,18 @@ export class TareasFormComponent implements OnInit {
 
     this.tareaService.getTareasPadre().subscribe(tareasPadre => {
 
+      //Obtenemos todas las tareas padre y las recorremos para obtener sus hijos recursivamente.
       tareasPadre.forEach(tareaPadre => {
-        this.recorrerSubtareas(tareaPadre)
+        this.obtenerSubtareas(tareaPadre)
       })
-
+      //Esperamos a que se haya completado el forEach
       setTimeout( () => {
         this.tareasPadre = tareasPadre
       }, 1500 );
 
       this.activatedRoute.params.subscribe(params => {
         let id = params['id']
+        //Si hay un id en la ruta, obtenemos la tarea.
         if(id){
           this.tareaService.getTarea(id).subscribe( tarea => {
             this.tarea = tarea;
@@ -113,6 +115,8 @@ export class TareasFormComponent implements OnInit {
 
               }
             })
+            //Si la tarea recogida no tiene tarea padre(es null), creamos una nueva tarea vacia con id null
+            //Esto se hace para que en el ngModel del formulario no de error al ser null la tarea padre.
             if(this.tarea.tareaPadre==null){
               this.tarea.tareaPadre=new Tarea();
               this.tarea.tareaPadre.id = null;
@@ -126,11 +130,11 @@ export class TareasFormComponent implements OnInit {
 
   }
 
-  recorrerSubtareas(tarea: Tarea){
+  obtenerSubtareas(tarea: Tarea){
     tarea.subTareas = new Array<Tarea>()
     this.tareaService.getSubTareas(tarea.id).subscribe(subTareas => {
       subTareas.forEach(subTarea => {
-        this.recorrerSubtareas(subTarea)
+        this.obtenerSubtareas(subTarea)
         tarea.subTareas.push(subTarea)
       })
     })
@@ -143,28 +147,6 @@ export class TareasFormComponent implements OnInit {
       })
     }
   }
-
-  /*onExpandChange(e: NzFormatEmitEvent, id: string): void {
-    const node = e.node;
-    if(node.getChildren().length==0){
-      this.tareaService.getSubTareas(node.key).subscribe(subTareas => {
-        if(subTareas.length != 0){
-          subTareas.forEach(subTarea => {
-            this.tareaService.getSubTareas(subTarea.id).subscribe(subTareasSubTarea => {
-              if(subTareasSubTarea.length==0){
-                node.addChildren([{key: subTarea.id.toString() ,title: subTarea.titulo, isLeaf: true}])
-              } else{
-                node.addChildren([{key: subTarea.id.toString() ,title: subTarea.titulo, isLeaf: false}])
-              }
-              document.getElementById(id).click();
-              document.getElementById(id).click();
-            })
-          })
-
-        }
-      })
-    }
-  }*/
 
   completarJsonTarea(): void{
     if(this.tarea.tareaPadre.id==null){
@@ -180,16 +162,7 @@ export class TareasFormComponent implements OnInit {
         this.tarea.usuarios[index] = usuarioCompleto;
       })
     })
-    //this.completarTareasPrecedentes();
   }
-
-  /*completarTareasPrecedentes(): void{
-    this.tarea.tareasPrecedentes.forEach((tareaPrecedente, index) => {
-      this.tareaService.getTarea(this.tarea.tareasPrecedentes[index].id).subscribe(tareaPrecedente => {
-        this.tarea.tareasPrecedentes[index] = tareaPrecedente
-      })
-    });
-  }*/
 
   create(): void{
     this.completarJsonTarea()
@@ -220,16 +193,20 @@ export class TareasFormComponent implements OnInit {
     }
   }
 
+  //Cambio de estado
   empezarTarea(): void{
     this.tarea.estado = "enProceso";
     this.update();
   }
 
+  //Cambio de estado
   finalizarTarea(): void{
     this.tarea.estado = "Finalizada";
     this.update();
   }
 
+  //Al seleccionar una tarea padre, se autoselecciona como tareas precedentes las de la tarea padre
+  //Esto es para las subtareas de nivel 1 de una tarea padre, ya que dependenderán de las mismas tareas que su tarea padre
   cambioTareaPadre(): void{
     this.tarea.tareasPrecedentes = this.tarea.tareaPadre.tareasPrecedentes;
   }

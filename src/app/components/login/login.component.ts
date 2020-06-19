@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthenticationService } from 'src/app/services/auth.service';
 
@@ -16,10 +16,8 @@ export class LoginComponent implements OnInit {
   successMessage: string;
   invalidLogin = false;
   loginSuccess = false;
-  //credentials = {username: '', password: ''};
 
   constructor(
-    //private route: ActivatedRoute,
     private router: Router,
     private authenticationService: AuthenticationService,
     private http: HttpClient){
@@ -29,13 +27,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
   }
 
-  /*login() {
-    this.authenticationService.authenticate(this.credentials, () => {
-        this.router.navigateByUrl('/');
-    });
-    return false;
-  }*/
-
+  //Envío del formulario login
   handleLogin() {
     this.authenticationService.authenticationService(this.username, this.password).subscribe((result)=> {
       this.invalidLogin = false;
@@ -47,7 +39,8 @@ export class LoginComponent implements OnInit {
       this.loginSuccess = false;
     });
   }
-
+  
+  //Cierre de sesión
   logout(){
     this.authenticationService.logout();
   }

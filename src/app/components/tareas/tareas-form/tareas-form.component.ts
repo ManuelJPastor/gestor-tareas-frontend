@@ -11,6 +11,9 @@ import { UsuarioService } from 'src/app/services/usuario.service';
 import { AuthenticationService } from 'src/app/services/auth.service';
 import { Comentario } from 'src/app/objects/comentario';
 import {Location} from '@angular/common';
+import { PresupuestoService } from 'src/app/services/presupuesto.service';
+import { Presupuesto } from 'src/app/objects/presupuesto';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-tareas-form',
@@ -40,7 +43,7 @@ export class TareasFormComponent implements OnInit {
 
   private comentarioNuevo: Comentario = new Comentario();
 
-  constructor(private authService: AuthenticationService, private tareaService: TareaService, private sectorService: SectorService, private usuarioService: UsuarioService, private router: Router, private activatedRoute: ActivatedRoute, private _location: Location) { }
+  constructor(private authService: AuthenticationService, private presupuestoService: PresupuestoService, private tareaService: TareaService, private sectorService: SectorService, private usuarioService: UsuarioService, private router: Router, private activatedRoute: ActivatedRoute, private _location: Location) { }
 
   ngOnInit() {
     this.cargarTarea();
@@ -103,6 +106,7 @@ export class TareasFormComponent implements OnInit {
             this.tareaService.getComentarios(this.tarea.id).subscribe(comentarios => {
               this.tarea.comentarios = comentarios;
             })
+            this.cargarPresupuestos();
             this.tareaService.getSubTareas(this.tarea.id).subscribe(subTareas => {
               if(subTareas.length==0){
                 this.hasSubTareas = false;
@@ -128,6 +132,12 @@ export class TareasFormComponent implements OnInit {
       })
     });
 
+  }
+
+  cargarPresupuestos(){
+    this.presupuestoService.getPresupuestosTarea(this.tarea.id).subscribe(presupuestos => {
+      this.tarea.presupuestos = presupuestos
+    })
   }
 
   obtenerSubtareas(tarea: Tarea){
@@ -223,6 +233,29 @@ export class TareasFormComponent implements OnInit {
   cancelarEditar(): void{
     this.editando = false;
     this.cargarTarea()
+  }
+
+  subirPresupuestos(): void{
+    var files: FileList = document.getElementById('presupuestos').files
+    for(var i=0; i<files.length; i++){
+      this.presupuestoService.create(files.item(i), this.tarea.id).subscribe(response =>{
+        this.cargarPresupuestos();
+      })
+    }
+    document.getElementById('presupuestos').value='';
+  }
+
+  downloadPresupuesto(id): void{
+    this.presupuestoService.downloadPresupuesto(id).subscribe(data=> {
+      const url= window.URL.createObjectURL(data);
+      window.open(url);
+    });
+  }
+
+  deletePresupuesto(id): void{
+    this.presupuestoService.delete(id).subscribe(response => {
+      this.cargarPresupuestos();
+    })
   }
 
   crearComentario(): void{

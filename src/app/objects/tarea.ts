@@ -2,6 +2,7 @@ import { Sector } from './sector';
 import { Usuario } from './usuario';
 import { Actor } from './actor';
 import { Comentario } from './comentario';
+import { Presupuesto } from './presupuesto';
 
 export class Tarea {
   id: number;
@@ -21,4 +22,5 @@ export class Tarea {
   usuarios: Usuario[] = new Array<Usuario>();
   actores: Actor[] = new Array<Actor>();
   comentarios: Comentario[] = new Array<Comentario>();
+  presupuestos: Presupuesto[] = new Array<Presupuesto>();
 }

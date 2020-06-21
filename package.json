@@ -23,6 +23,7 @@
     "@angular/router": "~9.0.7",
     "@types/jquery": "^3.3.34",
     "bootstrap": "^4.4.1",
+    "file-saver": "^2.0.2",
     "jquery": "^3.4.1",
     "jspdf": "^1.5.3",
     "ng-multiselect-dropdown": "^0.2.10",

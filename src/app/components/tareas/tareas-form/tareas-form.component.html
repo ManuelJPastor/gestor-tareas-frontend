@@ -181,6 +181,36 @@
         </div>
       </div>
 
+      <div class="form-group row">
+        <label for="presupuestos" class="col-form-label col-sm-3">Presupuestos</label>
+        <div class="col-sm-8">
+          <table class="table card-table table-bordered table-striped" *ngIf="tarea.presupuestos?.length>0 else noPresupuestos">
+            <thead>
+              <tr>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let presupuesto of tarea.presupuestos" style="height: 30px;">
+                <td class="text-center"><a class="btn text-primary" (click)="downloadPresupuesto(presupuesto.id)">{{presupuesto.nombre}}</a></td>
+                <td class="text-center w-25" *ngIf="editando">
+                  <button type="button" name="button" (click)="deletePresupuesto(presupuesto.id)" class="btn btn-danger btn-sm">Eliminar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <ng-template #noPresupuestos>
+              <h4>No hay presupuestos guardados</h4>
+          </ng-template>
+        </div>
+
+      </div>
+      <div class="form-group row" *ngIf="editando">
+        <div class="offset-sm-3 col-sm-6">
+          <input id="presupuestos" type="file" name="presupuestos" multiple/>
+        </div>
+        <button class="btn btn-success col-sm-2" role="button" (click)='subirPresupuestos()'>Subir</button>
+      </div>
+
       <div class="form-group row" *ngIf="editando">
         <label class="col-form-label col-sm-12">* Los campos son requeridos</label>
       </div>
@@ -222,6 +252,5 @@
        <button class="btn btn-danger btn-sm float-right mt-1" *ngIf="(comentario.usuario.email == usuarioLogged.email) || authService.isAdmin()" (click)="eliminarComentario(comentario)">Eliminar</button>
       </div>
     </div>
-
   </div>
 </div>

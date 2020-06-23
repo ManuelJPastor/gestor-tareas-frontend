@@ -28,7 +28,7 @@ private edges;
 private network: Network;
 
 private editTarea: Tarea = new Tarea();
-private tarea: Tarea;
+private tarea: Tarea = new Tarea();
 private tareaPadre: Tarea = null;
 private sectores: Sector[];
 private usuarios: Usuario[];
@@ -41,8 +41,9 @@ private ramaTareas: Tarea[];
 private hasSubTareas: boolean;
 
 private desplegarSubtareas: boolean = false;
-
+//Leyenda
 private leyenda: {actual: any, pendiente: any, disponible: any, enProceso: any, finalizada: any};
+//Colores disponibles
 private colores = {
                   azul: {border: '#026AA2',  background: '#077BBA', highlight: { border: '#026AA2', background: '#077BBA'}},
                   gris: {border: '#343a40',  background: '#B4B8BB', highlight: { border: '#343a40', background: '#B4B8BB'}},
@@ -55,6 +56,7 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
 
   ngOnInit(): void {
 
+    //Leyenda por defecto
     this.leyenda = {actual:  this.colores.azul.background,
       pendiente: this.colores.gris,
       disponible: this.colores.verde,
@@ -67,6 +69,7 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
     this.usuarioService.getUsuarios().subscribe(usuarios => {
       this.usuarios = usuarios
     })
+
     //ajustes select usuarios
     this.usuariosSettings = {
       singleSelection: false,
@@ -89,14 +92,26 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
             this.tareaPadre = this.tarea.tareaPadre
             this.crearRama(tareas)
           });
+        },
+        err=>{
+          Swal.fire('Tarea no encontrada' ,'La tarea con id '+id+' no existe.', 'error');
+          this.tareaService.getTareasPadre().subscribe(tareas => {
+            this.crearRama(tareas)
+          })
+        })
+      }
+      else{
+        this.tareaService.getTareasPadre().subscribe(tareas => {
+          this.crearRama(tareas)
         })
       }
     })
 
-    document.getElementById('mynetwork').oncontextmenu = function() {return false;}
+    //Tamaño de visualización
     document.getElementById('mynetwork').style.height = (window.innerHeight - 200) + "px";
   }
 
+  //Al realizar cambio en la leyenda se actualiza la rama con el nuevo color
   cambiarLeyenda(tipo: string): void{
     var color = document.getElementById(tipo).value
     if(tipo == 'actual'){
@@ -104,11 +119,10 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
     }else{
       this.leyenda[tipo] = this.colores[color]
     }
-
     this.crearRama(this.ramaTareas)
-
   }
 
+//Cambia la rama a la de las subtareas de la tarea seleccionada
   abrirSubtareas(): void{
     if(this.network.getSelectedNodes().length!=0){
       this.tareaService.getSubTareas(this.network.getSelectedNodes()[0]).subscribe(subTareas => {
@@ -135,9 +149,11 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
 
       tareas.forEach(tarea => {
         var node
+        //Se crea el nodo de la tarea
         node = {id: tarea.id, label: `${tarea.titulo}\n<b>(${this.datepipe.transform(tarea.fechaMax, 'dd-MM-yyyy')})</b>`,
                 level: tarea.nivel, fechaMax: tarea.fechaMax, sector: tarea.sector, subTareas: false};
 
+        //Se asigna el color de la tarea según el estado
         switch(tarea.estado){
           case "Pendiente":
             node.color = Object.assign({} , this.leyenda.pendiente);
@@ -153,6 +169,7 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
             break;
         }
 
+        //Se le cambia el borde si es la tarea por la cual se ha entrado a la visualización
         if(tarea.id == this.tarea.id){
           node.borderWidth = 2;
           node.borderWidthSelected = 3;
@@ -160,7 +177,7 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
           node.color.highlight.border = this.leyenda.actual;
         }
 
-
+        //Se indica si tiene subtareas, y si esta la opción de desplegarSubtareas se crean las subtareas
         this.tareaService.getSubTareas(tarea.id).subscribe(subTareas => {
           if(subTareas.length!=0){
             node.subTareas = true;
@@ -173,6 +190,7 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
           this.nodes.add(node);
         })
 
+        //Creación de enlaces entre las tareas
         tarea.tareasPrecedentes.forEach(tareaPrecedente => {
           var edge = {from: tarea.id, to: tareaPrecedente.id};
           this.edges.add(edge);
@@ -180,7 +198,7 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
 
       })
 
-        // create a network
+        //Creación de la visualización -> https://visjs.github.io/vis-network/docs/network/
         var container = document.getElementById('mynetwork');
         var data = {
           nodes: this.nodes,
@@ -361,10 +379,12 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
         setTimeout(()=>{
           this.network = new Network(container, data, options);
 
+          //Doble click para abrir subtareas
           this.network.on('doubleClick', (event)=> {
             this.abrirSubtareas();
           })
 
+          //Mantener pulsado para mostrar botón cambio de estado
           this.network.on('hold', (params)=>{
             this.tareaService.getMisTareas(this.auth.getLoggedInUserName()).subscribe(tareas => {
               if(tareas.find(tarea => tarea.id == params.nodes[0]) || this.auth.isAdmin()){
@@ -389,6 +409,7 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
               }
             })
           })
+
 
           this.network.on('select', (params)=>{
             document.getElementById("edicion-estado").style.display = "none";
@@ -550,7 +571,10 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
     document.getElementById('edicion-estado').style.display = "none";
   }
 
+  //Guardado de rama en pdf
   imprimirRama():void {
+
+    //SE AJUSTA EL TAMAÑO DE CANVAS A LA RAMA DE TAREAS PARA PODER REALIZAR LA CAPTURA CON UN TAMAÑO DE LAS TAREAS ÓPTIMO
     var container = document.getElementById('mynetwork');
     var heigthInicial = container.style.height;
     var widthInicial = container.style.width;
@@ -621,6 +645,7 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
     this.network.redraw()
     this.network.fit()
 
+    //DESPUES DE AJUSTAR EL CANVAS SE REALIZA LA CAPTURA Y SE GUARDA EN UN PDF
     setTimeout( () => {
       var canvas = document.getElementsByTagName("canvas")[0];
       var imgData = canvas.toDataURL("rama-"+this.tarea.titulo+"/jpeg", 1.0);
@@ -641,6 +666,8 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
       height = pdf.internal.pageSize.getHeight();
       pdf.addImage(imgData, 'JPEG', 0, 0,width,height);
       pdf.save("rama-"+this.tarea.titulo+".pdf");
+
+      //SE VUELVE AL TAMAÑO NORMAL DEL CANVAS
       container.style.height = heigthInicial;
       container.style.width = widthInicial;
       this.network.redraw()

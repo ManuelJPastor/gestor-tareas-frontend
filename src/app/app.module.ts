@@ -38,6 +38,7 @@ const routes: Routes = [
   {path: 'tareas', component: TareasComponent, canActivate: [ AuthUserGuard]},
   {path: 'tareas/form', component: TareasFormComponent, canActivate: [ AuthUserGuard ]},
   {path: 'tareas/form/:id', component: TareasFormComponent, canActivate: [ AuthUserGuard, ParticipanteGuard ]},
+  {path: 'tareas/rama', component: TareasRamaComponent, canActivate: [ AuthUserGuard ]},
   {path: 'tareas/rama/:id', component: TareasRamaComponent, canActivate: [ AuthUserGuard ]},
   {path: 'settings', component: SettingsComponent, canActivate: [ AuthAdminGuard ]},
   {path: 'settings/sectores', component: SectoresComponent, canActivate: [ AuthAdminGuard ]},

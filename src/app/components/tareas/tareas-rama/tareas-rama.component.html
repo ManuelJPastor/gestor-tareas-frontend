@@ -1,3 +1,4 @@
+<!-- Botones -->
 <div id="buttons" class="mb-2">
   <button class="btn btn-secondary btn-sm mx-1" (click)="ramaTareaPadre()"  *ngIf="tareaPadre!=null"><i class="fa fa-chevron-left"></i> {{tareaPadre.titulo}}</button>
   <button class="btn btn-light btn-sm mx-1" (click)="imprimirRama()"><i class="fa fa-save"></i> Guardar Rama</button>
@@ -8,7 +9,7 @@
 </div>
 
 
-
+<!-- Formulario creación tarea -->
 <div id="node-popUp">
   <h3 id="node-operation" class="text-center">node</h3>
   <form #tareaForm="ngForm" novalidate>
@@ -64,6 +65,7 @@
   <button id="node-cancelButton" class="btn btn-sm btn-danger">Cancelar</button>
 </div>
 
+<!-- Botón modificar estado -->
 <div id="edicion-estado">
   <button class="btn btn-secondary" role="button" *ngIf="editTarea.estado=='Pendiente'" disabled>No disponible</button>
   <button class="btn btn-success" role="button" *ngIf="editTarea.estado=='Disponible'" (click)="empezarTarea()">Empezar tarea</button>
@@ -72,9 +74,11 @@
   <button class="btn btn-danger" role="button" *ngIf="editTarea.estado=='Finalizada'" disabled>Tarea finalizada</button>
 </div>
 
+<!-- Visualización -->
 <div id="mynetwork" class="border rounded border-dark">
 </div>
 
+<!-- Leyenda -->
 <div class="font-weight-bold d-inline">
   <div class="d-inline">Leyenda: </div>
   <select id="actual" class="d-inline form-control font-weight-bold mx-2" style="width: 15%;" [style.color]="leyenda.actual" (change)="cambiarLeyenda('actual')">

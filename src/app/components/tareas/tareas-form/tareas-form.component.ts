@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
@@ -12,8 +12,6 @@ import { AuthenticationService } from 'src/app/services/auth.service';
 import { Comentario } from 'src/app/objects/comentario';
 import {Location} from '@angular/common';
 import { PresupuestoService } from 'src/app/services/presupuesto.service';
-import { Presupuesto } from 'src/app/objects/presupuesto';
-import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-tareas-form',
@@ -134,12 +132,14 @@ export class TareasFormComponent implements OnInit {
 
   }
 
+//Mostrar los presupuestos de la tarea
   cargarPresupuestos(){
     this.presupuestoService.getPresupuestosTarea(this.tarea.id).subscribe(presupuestos => {
       this.tarea.presupuestos = presupuestos
     })
   }
 
+//Recogida de subtareas de forma recursiva
   obtenerSubtareas(tarea: Tarea){
     tarea.subTareas = new Array<Tarea>()
     this.tareaService.getSubTareas(tarea.id).subscribe(subTareas => {
@@ -150,6 +150,7 @@ export class TareasFormComponent implements OnInit {
     })
   }
 
+//Guardar tarea padre seleccionada
   selectTareaPadre(id: number): void {
     if(id!=null){
       this.tareaService.getTarea(id).subscribe(tarea=>{
@@ -158,6 +159,7 @@ export class TareasFormComponent implements OnInit {
     }
   }
 
+//Se completa el Json para que no haya errores debido a que se guarda solo el id
   completarJsonTarea(): void{
     if(this.tarea.tareaPadre.id==null){
       this.tarea.tareaPadre=null;
@@ -173,6 +175,7 @@ export class TareasFormComponent implements OnInit {
       })
     })
   }
+
 
   create(): void{
     this.completarJsonTarea()

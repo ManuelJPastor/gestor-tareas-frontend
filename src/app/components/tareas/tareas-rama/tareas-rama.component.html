@@ -18,7 +18,7 @@
         <tr>
           <th class="text-center" style="width: 25%;">Titulo</th>
           <th class="text-center" style="width: 25%;">FechaMax</th>
-          <th class="text-center" style="width: 25%;">Sector</th>
+          <th class="text-center" style="width: 25%;">Departamento</th>
           <th class="text-center" style="width: 25%;">Usuarios</th>
         </tr>
       </thead>
@@ -82,7 +82,7 @@
 <div class="font-weight-bold d-inline">
   <div class="d-inline">Leyenda: </div>
   <select id="actual" class="d-inline form-control font-weight-bold mx-2" style="width: 15%;" [style.color]="leyenda.actual" (change)="cambiarLeyenda('actual')">
-    <option value="azul" class="font-weight-bold" [style.color]="colores.azul.background">Actual</option>
+    <option value="azul" class="font-weight-bold" [style.color]="colores.azul.background" selected>Actual</option>
     <option value="gris" class="font-weight-bold" [style.color]="colores.gris.background">Actual</option>
     <option value="verde" class="font-weight-bold" [style.color]="colores.verde.background">Actual</option>
     <option value="amarillo" class="font-weight-bold" [style.color]="colores.amarillo.background">Actual</option>
@@ -90,7 +90,7 @@
   </select>
   <select id="pendiente" class="d-inline form-control font-weight-bold mx-2" style="width: 15%;" [style.color]="leyenda.pendiente.background" (change)="cambiarLeyenda('pendiente')">
     <option value="azul" class="font-weight-bold" [style.color]="colores.azul.background">Pendiente</option>
-    <option value="gris" class="font-weight-bold" [style.color]="colores.gris.background">Pendiente</option>
+    <option value="gris" class="font-weight-bold" [style.color]="colores.gris.background" selected>Pendiente</option>
     <option value="verde" class="font-weight-bold" [style.color]="colores.verde.background">Pendiente</option>
     <option value="amarillo" class="font-weight-bold" [style.color]="colores.amarillo.background">Pendiente</option>
     <option value="rojo" class="font-weight-bold" [style.color]="colores.rojo.background">Pendiente</option>
@@ -98,7 +98,7 @@
   <select id="disponible" class="d-inline form-control font-weight-bold mx-2" style="width: 15%;" [style.color]="leyenda.disponible.background" (change)="cambiarLeyenda('disponible')">
     <option value="azul" class="font-weight-bold" [style.color]="colores.azul.background">Disponible</option>
     <option value="gris" class="font-weight-bold" [style.color]="colores.gris.background">Disponible</option>
-    <option value="verde" class="font-weight-bold" [style.color]="colores.verde.background">Disponible</option>
+    <option value="verde" class="font-weight-bold" [style.color]="colores.verde.background" selected>Disponible</option>
     <option value="amarillo" class="font-weight-bold" [style.color]="colores.amarillo.background">Disponible</option>
     <option value="rojo" class="font-weight-bold" [style.color]="colores.rojo.background">Disponible</option>
   </select>
@@ -106,7 +106,7 @@
     <option value="azul" class="font-weight-bold" [style.color]="colores.azul.background">EnProceso</option>
     <option value="gris" class="font-weight-bold" [style.color]="colores.gris.background">EnProceso</option>
     <option value="verde" class="font-weight-bold" [style.color]="colores.verde.background">EnProceso</option>
-    <option value="amarillo" class="font-weight-bold" [style.color]="colores.amarillo.background">EnProceso</option>
+    <option value="amarillo" class="font-weight-bold" [style.color]="colores.amarillo.background" selected>EnProceso</option>
     <option value="rojo" class="font-weight-bold" [style.color]="colores.rojo.background">EnProceso</option>
   </select>
   <select id="finalizada" class="d-inline form-control font-weight-bold mx-2" style="width: 15%;" [style.color]="leyenda.finalizada.background" (change)="cambiarLeyenda('finalizada')">
@@ -114,6 +114,6 @@
     <option value="gris" class="font-weight-bold" [style.color]="colores.gris.background">Finalizada</option>
     <option value="verde" class="font-weight-bold" [style.color]="colores.verde.background">Finalizada</option>
     <option value="amarillo" class="font-weight-bold" [style.color]="colores.amarillo.background">Finalizada</option>
-    <option value="rojo" class="font-weight-bold" [style.color]="colores.rojo.background">Finalizada</option>
+    <option value="rojo" class="font-weight-bold" [style.color]="colores.rojo.background" selected>Finalizada</option>
   </select>
 </div>

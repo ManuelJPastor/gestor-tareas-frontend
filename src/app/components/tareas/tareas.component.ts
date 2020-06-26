@@ -16,7 +16,7 @@ export class TareasComponent implements OnInit {
 
   sortAscFecha: boolean = true;
 
-  mostrarTodas: boolean = true;
+  mostrarTodas: boolean = false;
 
   tareasAll: Tarea[] = new Array<Tarea>();
   tareas: Tarea[] = new Array<Tarea>();
@@ -33,7 +33,7 @@ export class TareasComponent implements OnInit {
   constructor(private tareaService: TareaService, private usuarioService: UsuarioService, private authService: AuthenticationService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
-    this.mostrarTareas();
+    this.mostrarTareas(this.mostrarTodas);
   }
 
   busqueda(){
@@ -75,8 +75,8 @@ export class TareasComponent implements OnInit {
     }
   }
 
-  mostrarTareas(): void{
-    this.mostrarTodas=!this.mostrarTodas;
+  mostrarTareas(mostrarTodas: boolean): void{
+    this.mostrarTodas = mostrarTodas;
     if(!this.mostrarTodas){
       this.tareaService.getMisTareas(this.authService.getLoggedInUserName()).subscribe(misTareas => {
         this.tareas = misTareas.sort((a, b) => {
@@ -121,7 +121,7 @@ export class TareasComponent implements OnInit {
     }).then((result) => {
       if (result.value) {
         this.tareaService.delete(tarea.id).subscribe( response => {
-          this.tareaService.getTareas().subscribe(tareas => this.tareas = tareas)
+          this.mostrarTareas(this.mostrarTodas)
           Swal.fire(
             '¡Eliminada!',
             'La tarea ha sido borrada.',
@@ -130,6 +130,21 @@ export class TareasComponent implements OnInit {
         })
       }
     })
+  }
+
+  async guardarPlantilla(tarea: Tarea): Promise<void>{
+
+    const { value: tituloPlantilla } = await Swal.fire({
+      title: 'Introduce el nombre de la plantilla',
+      input: 'text',
+      inputValue: tarea.titulo,
+      showCancelButton: true,
+    })
+
+    this.tareaService.guardarPlantilla(tarea, tituloPlantilla).subscribe(response => {
+      Swal.fire('Plantilla Creada', response.mensaje, 'success');
+    })
+
   }
 
 }

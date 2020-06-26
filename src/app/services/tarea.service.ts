@@ -16,6 +16,8 @@ export class TareaService {
 
   private urlEndPointComentarios:string = 'http://localhost:8080/api/comentarios';
 
+  private urlEndPointPlantillas:string = 'http://localhost:8080/api/plantillas';
+
   private httpHeaders = new HttpHeaders({'Content-Type':'application/json'
  });
 
@@ -116,5 +118,46 @@ export class TareaService {
 
   getEstados(): Observable<string[]>{
     return this.http.get<string[]>(this.urlEndPoint+'/estados', {headers: this.httpHeaders});
+  }
+
+  getPlantillas(): Observable<Tarea[]> {
+    return this.http.get<Tarea[]>(this.urlEndPointPlantillas, {headers: this.httpHeaders});
+  }
+
+  guardarPlantilla(tarea: Tarea, titulo: String): Observable<any> {
+    return this.http.post<any>(`${this.urlEndPointPlantillas}/crear/${titulo}`, tarea, {headers: this.httpHeaders}).pipe(
+      catchError(e => {
+
+        if(e.status==400){
+          return throwError(e);
+        }
+
+        Swal.fire(e.error.mensaje, e.error.error, 'error');
+        return throwError(e);
+      })
+    );
+  }
+
+  usarPlantilla(id: number):Observable<any> {
+    return this.http.get<any>(this.urlEndPoint+'/plantillas/'+id).pipe(
+      catchError(e => {
+
+        if(e.status==400){
+          return throwError(e);
+        }
+
+        Swal.fire(e.error.mensaje, e.error.error, 'error');
+        return throwError(e);
+      })
+    );
+  }
+
+  eliminarPlantilla(id: number): Observable<void>{
+    return this.http.delete<void>(`${this.urlEndPointPlantillas}/${id}`, {headers: this.httpHeaders}).pipe(
+      catchError(e => {
+        Swal.fire(e.error.mensaje, e.error.error, 'error');
+        return throwError(e);
+      })
+    );
   }
 }

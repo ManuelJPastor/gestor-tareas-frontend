@@ -16,6 +16,11 @@
           </div>
         </div>
       </li>
+      <li class="nav-item mx-2" *ngIf="authenticationService.isAdmin()">
+        <div class="btn-group" routerLinkActive="active">
+          <a class="nav-link" routerLink="/plantillas">Plantillas</a>
+        </div>
+      </li>
     </ul>
 
     <div class="navbar-nav">

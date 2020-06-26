@@ -31,6 +31,7 @@ import { DatePipe } from '@angular/common';
 import {AutosizeModule} from 'ngx-autosize';
 import { ParticipanteGuard } from './guards/participante.guard';
 import { PerfilGuard } from './guards/perfil.guard';
+import { PlantillasComponent } from './components/plantillas/plantillas.component';
 
 const routes: Routes = [
 
@@ -47,6 +48,7 @@ const routes: Routes = [
   {path: 'settings/usuarios', component: UsuariosComponent, canActivate: [ AuthAdminGuard ]},
   {path: 'usuarios/form', component: UsuariosFormComponent, canActivate: [ AuthAdminGuard ]},
   {path: 'usuarios/form/:id', component: UsuariosFormComponent, canActivate: [ AuthUserGuard, PerfilGuard ]},
+  {path: 'plantillas', component: PlantillasComponent, canActivate: [ AuthAdminGuard ]},
   {path: '**', redirectTo: '/tareas', pathMatch: 'full'},
 ];
 
@@ -65,6 +67,7 @@ const routes: Routes = [
     SectoresComponent,
     SectoresFormComponent,
     TareasRamaComponent,
+    PlantillasComponent,
   ],
   imports: [
     BrowserModule,

@@ -106,6 +106,8 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
         })
       }
     })
+    //Desactivar acción click derecho en mynetwork
+    document.getElementById('mynetwork').oncontextmenu = function() {return false;}
 
     //Tamaño de visualización
     document.getElementById('mynetwork').style.height = (window.innerHeight - 200) + "px";
@@ -378,6 +380,33 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
 
         setTimeout(()=>{
           this.network = new Network(container, data, options);
+
+          this.network.on('oncontext', (event) => {
+            var id = this.network.getNodeAt(event.pointer.DOM);
+            this.tareaService.getTarea(id).subscribe(tarea => {
+              this.editTarea = tarea;
+              document.getElementById("node-saveButton").onclick = ()=>{
+                this.tareaService.update(this.editTarea).subscribe(response => {
+                  if(this.tareaPadre == null){
+                    this.tareaService.getTareasPadre().subscribe(ramaTareas => {
+                      this.crearRama(ramaTareas)
+                    })
+                  } else{
+                    this.tareaService.getSubTareas(this.tareaPadre.id).subscribe(ramaTareas => {
+                      this.crearRama(ramaTareas)
+                    })
+                  }
+                });
+                this.clearNodePopUp();
+              }
+              document.getElementById("node-cancelButton").onclick = ()=>{
+                this.clearNodePopUp();
+              }
+
+              document.getElementById("node-popUp").style.display = "block";
+            })
+            document.getElementById("node-operation").innerHTML = "Editar Tarea";
+          })
 
           //Doble click para abrir subtareas
           this.network.on('doubleClick', (event)=> {

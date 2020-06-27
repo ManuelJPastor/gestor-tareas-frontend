@@ -23,4 +23,5 @@ export class Tarea {
   actores: Actor[] = new Array<Actor>();
   comentarios: Comentario[] = new Array<Comentario>();
   presupuestos: Presupuesto[] = new Array<Presupuesto>();
+  presupuestoEscogidoId: number;
 }

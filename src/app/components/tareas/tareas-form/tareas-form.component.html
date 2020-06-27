@@ -194,7 +194,11 @@
             <tbody>
               <tr *ngFor="let presupuesto of tarea.presupuestos" style="height: 30px;">
                 <td class="text-center"><a class="btn text-primary" (click)="downloadPresupuesto(presupuesto.id)">{{presupuesto.nombre}}</a></td>
-                <td class="text-center w-25" *ngIf="editando">
+                <td class="text-center w-25 align-middle">
+                  <input id="escogido{{presupuesto.id}}" type="radio" style="margin-left: 10px;" name="escogido" [value]="presupuesto.id" [(ngModel)]="tarea.presupuestoEscogidoId">
+                  <label for="escogido{{presupuesto.id}}" class="ml-2 text-white">Escogido</label>
+                </td>
+                <td class="text-center w-25  align-middle" *ngIf="editando">
                   <button type="button" name="button" (click)="deletePresupuesto(presupuesto.id)" class="btn btn-danger btn-sm">Eliminar</button>
                 </td>
               </tr>

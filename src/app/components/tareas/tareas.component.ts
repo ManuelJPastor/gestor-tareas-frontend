@@ -140,10 +140,11 @@ export class TareasComponent implements OnInit {
       inputValue: tarea.titulo,
       showCancelButton: true,
     })
-
-    this.tareaService.guardarPlantilla(tarea, tituloPlantilla).subscribe(response => {
-      Swal.fire('Plantilla Creada', response.mensaje, 'success');
-    })
+    if(tituloPlantilla){
+      this.tareaService.guardarPlantilla(tarea, tituloPlantilla).subscribe(response => {
+        Swal.fire('Plantilla Creada', response.mensaje, 'success');
+      })
+    }
 
   }
 

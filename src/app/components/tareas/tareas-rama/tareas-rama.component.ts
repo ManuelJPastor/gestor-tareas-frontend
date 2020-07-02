@@ -383,29 +383,31 @@ constructor(private datepipe: DatePipe,private usuarioService: UsuarioService, p
 
           this.network.on('oncontext', (event) => {
             var id = this.network.getNodeAt(event.pointer.DOM);
-            this.tareaService.getTarea(id).subscribe(tarea => {
-              this.editTarea = tarea;
-              document.getElementById("node-saveButton").onclick = ()=>{
-                this.tareaService.update(this.editTarea).subscribe(response => {
-                  if(this.tareaPadre == null){
-                    this.tareaService.getTareasPadre().subscribe(ramaTareas => {
-                      this.crearRama(ramaTareas)
-                    })
-                  } else{
-                    this.tareaService.getSubTareas(this.tareaPadre.id).subscribe(ramaTareas => {
-                      this.crearRama(ramaTareas)
-                    })
-                  }
-                });
-                this.clearNodePopUp();
-              }
-              document.getElementById("node-cancelButton").onclick = ()=>{
-                this.clearNodePopUp();
-              }
+            if(id){
+              this.tareaService.getTarea(id).subscribe(tarea => {
+                this.editTarea = tarea;
+                document.getElementById("node-saveButton").onclick = ()=>{
+                  this.tareaService.update(this.editTarea).subscribe(response => {
+                    if(this.tareaPadre == null){
+                      this.tareaService.getTareasPadre().subscribe(ramaTareas => {
+                        this.crearRama(ramaTareas)
+                      })
+                    } else{
+                      this.tareaService.getSubTareas(this.tareaPadre.id).subscribe(ramaTareas => {
+                        this.crearRama(ramaTareas)
+                      })
+                    }
+                  });
+                  this.clearNodePopUp();
+                }
+                document.getElementById("node-cancelButton").onclick = ()=>{
+                  this.clearNodePopUp();
+                }
 
-              document.getElementById("node-popUp").style.display = "block";
-            })
-            document.getElementById("node-operation").innerHTML = "Editar Tarea";
+                document.getElementById("node-popUp").style.display = "block";
+              })
+              document.getElementById("node-operation").innerHTML = "Editar Tarea";
+            }
           })
 
           //Doble click para abrir subtareas

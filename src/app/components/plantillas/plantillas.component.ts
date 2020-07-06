@@ -82,17 +82,28 @@ export class PlantillasComponent implements OnInit {
     this.sortAscFecha = true;
   }
 
-  eliminarPlantilla(id: number): void{
-    this.tareaService.eliminarPlantilla(id).subscribe(response => {
+  eliminarPlantilla(plantilla: Tarea): void{
+    this.tareaService.eliminarPlantilla(plantilla.id).subscribe(response => {
       this.cargarPlantillas()
     })
   }
 
-  usarPlantilla(id: number): void{
-    this.tareaService.usarPlantilla(id).subscribe(response => {
-      Swal.fire('Tareas Creadas',`${response.mensaje}`, 'success')
-      this.router.navigate(['/tareas/rama/', response.tarea.id])
+  async usarPlantilla(plantilla: Tarea): Promise<void>{
+    const { value: tituloTareaPadre } = await Swal.fire({
+      title: 'Introduce el nombre de la tarea padre',
+      input: 'text',
+      inputValue: plantilla.titulo,
+      showCancelButton: true,
     })
+    if(tituloTareaPadre){
+      this.tareaService.usarPlantilla(plantilla.id, tituloTareaPadre).subscribe(response => {
+        Swal.fire('Tareas Creadas',`${response.mensaje}`, 'success')
+        this.router.navigate(['/tareas/rama/', response.tarea.id])
+      })
+    }
+
+
+
   }
 
 }

@@ -138,8 +138,8 @@ export class TareaService {
     );
   }
 
-  usarPlantilla(id: number):Observable<any> {
-    return this.http.get<any>(this.urlEndPoint+'/plantillas/'+id).pipe(
+  usarPlantilla(id: number, titulo: String):Observable<any> {
+    return this.http.get<any>(this.urlEndPoint+'/plantillas/'+id+'/'+titulo).pipe(
       catchError(e => {
 
         if(e.status==400){

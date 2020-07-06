@@ -60,7 +60,7 @@
             <td class="text-center">{{tarea.espacio}}</td>
             <td class="text-center">{{tarea.estado}}</td>
             <td class="text-center">
-              <button type="button" name="button" (click)='guardarPlantilla(tarea)' class="btn btn-success btn-sm">Guardar como plantilla</button>
+              <button type="button" name="button" (click)='guardarPlantilla(tarea)' class="btn btn-success btn-sm" *ngIf="authService.isAdmin()">Guardar como plantilla</button>
             </td>
             <td class="text-center">
               <button type="button" name="button" (click)='delete(tarea)' class="btn btn-danger btn-sm">Eliminar</button>
